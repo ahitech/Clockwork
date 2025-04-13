@@ -1,17 +1,25 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Ilib -Isrc
-LDFLAGS = -Llib -lhdate -lbe -lintl
+LDFLAGS = -Llib -lhdate -lbe -lstdc++ -lintl
 
-SRC = src/core/HebrewDate.cpp
-TEST = tests/test_date.cpp
+SRCS = \
+    src/core/HebrewDate.cpp \
+    src/modules/TodayModule.cpp \
+    src/main.cpp
 
-all: test
+OBJS = $(SRCS:.cpp=.o)
+TARGET = clockwork_gui
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
+
+clean:
+	rm -f $(TARGET) $(OBJS)
 
 test: test_date
 	./test_date
 
-test_date: $(SRC) $(TEST)
-	$(CXX) $(CXXFLAGS) $(TEST) $(SRC) -o test_date $(LDFLAGS)
-
-clean:
-	rm -f test_date
+test_date: src/core/HebrewDate.cpp tests/test_date.cpp
+	$(CXX) $(CXXFLAGS) tests/test_date.cpp src/core/HebrewDate.cpp -o test_date $(LDFLAGS)
