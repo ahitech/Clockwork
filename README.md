@@ -60,6 +60,7 @@ clockwork/
 ├── icons/              # SVG and HVIF icons
 ├── docs/               # DESIGN.md and dev notes
 ├── localization/       # *.catkeys, templates, translations, possibly - LanguageManager
+├── lib/                # Basically, *libhdate* and maybe additional resources.
 ├── tests/              # Test cases (unit-style)
 └── README.md
 ```
@@ -109,7 +110,8 @@ Clockwork uses Haiku's `.catkeys` localization system.
 
 ## 📜 License
 
-This project is licensed under the **MIT License** — see [`LICENSE`](LICENSE) for details.
+This project is licensed under the **GNU General Public License v2** — see [`LICENSE`](LICENSE) for details.  
+This license was chosen to comply with the licensing requirements of `libhdate`, which is released under the GPL v2 or later.
 
 ---
 
