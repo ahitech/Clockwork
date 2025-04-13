@@ -56,13 +56,11 @@ clockwork/
 │   ├── core/           # Hebrew date engine, wrapping libhdate
 │   ├── ui/             # Main window, module host, settings
 │   ├── modules/        # Individual modules: parsha, moon, countdown...
-│   ├── replicants/     # Support for Haiku replicants
-│   ├── localization/   # .catkeys and language manager
 │   └── main.cpp
 ├── icons/              # SVG and HVIF icons
 ├── docs/               # DESIGN.md and dev notes
+├── localization/       # *.catkeys, templates, translations, possibly - LanguageManager
 ├── tests/              # Test cases (unit-style)
-├── Makefile / Jamfile
 └── README.md
 ```
 
