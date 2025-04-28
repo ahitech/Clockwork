@@ -1,6 +1,11 @@
 CXX = g++
 CXXFLAGS = -Wall -std=c++17 -Ilib -Isrc
-LDFLAGS = -Llib -lhdate -lbe -lstdc++ -lintl
+LDFLAGS = -Llib -lhdate -lbe -lstdc++ -lintl -llocalestub
+
+NAME = Clockwork
+TYPE = APP
+APP_MIME_SIG = "application/x-vnd.clockwork-app"
+
 
 SRCS = \
     src/core/HebrewDate.cpp \

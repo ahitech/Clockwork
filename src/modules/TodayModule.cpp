@@ -1,10 +1,16 @@
 #include "TodayModule.h"
+
+#include <Catalog.h>
+#include <MenuItem.h>
 #include <Message.h>
 #include <Font.h>
 #include <Locale.h>
 #include <View.h>
 #include <StringView.h>
 #include <ctime>
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "TodayModuleView"
 
 TodayModuleView::TodayModuleView()
     : BView("TodayModuleView", B_WILL_DRAW),
@@ -27,7 +33,9 @@ TodayModuleView::TodayModuleView(BMessage* archive)
     : BView(archive),
       fToday(std::time(nullptr), true)
 {
+	archive->PrintToStream();
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    SetFlags(Flags() | B_DRAW_ON_CHILDREN);
     UpdateContent();
 }
 
@@ -48,7 +56,7 @@ void TodayModuleView::MouseDown(BPoint where)
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 	menu->SetFont(be_plain_font);
 	
-	WorkspacesWindow *window = dynamic_cast<WorkspacesWindow*>(Window());
+	BWindow* window = Window();
 	if (window != NULL) {
 		// inside Clockwork app
 	} else {
@@ -93,15 +101,17 @@ TodayModuleView::MouseMoved(BPoint where, uint32 transit,
 	float tabHeight = 5; // window->GetTabHeight();
 	float borderWidth = 5; // window->GetBorderWidth();
 
-		// Stretch frame to also accept mouse moves over the window borders
-		windowFrame.InsetBy(-borderWidth, -(tabHeight + borderWidth));
+	// Stretch frame to also accept mouse moves over the window borders
+	windowFrame.InsetBy(-borderWidth, -(tabHeight + borderWidth));
 
-		if (windowFrame.Contains(where))
-			if (Window()) {
-				Window()->Activate();
-			}
+	if (windowFrame.Contains(where))
+	{
+		if (Window()) {
+			Window()->Activate();
+		}
 	}
 }
+
 
 void TodayModuleView::AttachedToWindow() {
     BView::AttachedToWindow();
@@ -150,9 +160,17 @@ void TodayModuleView::MessageReceived(BMessage* message) {
 }
 
 status_t TodayModuleView::Archive(BMessage* into, bool deep) const {
-    BView::Archive(into, deep);
-    into->AddString("class", "TodayModuleView");
-    return B_OK;
+    status_t status = BView::Archive(into, deep);
+    if (status == B_OK) {
+    	status = into->AddString("class", "TodayModuleView");
+    }
+    if (B_OK == status) {
+    	status = into->AddRect("bounds", Bounds());
+    }
+    if (B_OK == status) {
+    	status = into->AddString("add_on", "application/x-vnd.clockwork-app");
+    }
+    return status;
 }
 
 BArchivable* TodayModuleView::Instantiate(BMessage* from) {
@@ -162,7 +180,10 @@ BArchivable* TodayModuleView::Instantiate(BMessage* from) {
 }
 
 void TodayModuleView::UpdateContent() {
+	this->fToday = HebrewDate(std::time(nullptr), true);
     fDateString = fToday.ToStringShort().c_str();
     fParsha = fToday.ToParsha().c_str();
     fHoliday = fToday.ToHolidayName().c_str();
 }
+
+

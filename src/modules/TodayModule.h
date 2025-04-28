@@ -2,6 +2,7 @@
 
 #include <Deskbar.h>
 #include <View.h>
+#include <PopUpMenu.h>
 #include <Screen.h>
 #include <String.h>
 #include <ctime>
