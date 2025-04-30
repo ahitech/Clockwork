@@ -6,7 +6,7 @@
 
 
 #include "HebrewDate.h"
-#include <hdate.h>
+#include "hdate.h"
 #include <sstream>
 #include <cstdlib>
 

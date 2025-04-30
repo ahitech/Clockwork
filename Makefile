@@ -1,30 +1,60 @@
-CXX = g++
-CXXFLAGS = -Wall -std=c++17 -Ilib -Isrc
-LDFLAGS = -Llib -lhdate -lbe -lstdc++ -lintl -llocalestub
-
 NAME = Clockwork
 TYPE = APP
-APP_MIME_SIG = "application/x-vnd.clockwork-app"
-
+APP_MIME_SIG = application/x-vnd.clockwork-app
 
 SRCS = \
     src/core/HebrewDate.cpp \
     src/modules/TodayModule.cpp \
     src/main.cpp
 
-OBJS = $(SRCS:.cpp=.o)
+LIBS = 	hdate \
+		be 	\
+		stdc++ \
+		supc++ \
+		localestub	\
+		root	\
+		intl
+		
+LIBPATHS =	boot/system/develop/lib	\
+			lib
+		   
+#	Additional paths to look for system headers. These use the form
+#	"#include <header>". Directories that contain the files in SRCS are
+#	NOT auto-included here.
+SYSTEM_INCLUDE_PATHS =  \
+		boot/system/develop/headers/be		\
+		boot/system/develop/headers/cpp 	\
+		boot/system/develop/headers/posix
+		   
+LOCAL_INCLUDE_PATHS =   src/core		\
+						lib				\
+						src/modules
+LOCALES = en
+
+#	Specify the level of optimization that you want. Specify either NONE (O0),
+#	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
+OPTIMIZE := NONE
+
+#	Specify the resource definition files to use. Full or relative paths can be
+#	used.
+RDEFS =
+
+#	Specify the resource files to use. Full or relative paths can be used.
+#	Both RDEFS and RSRCS can be utilized in the same Makefile.
+RSRCS =
+
+SYMBOLS := TRUE
+
+DEBUGGER := TRUE
+
+COMPILER_FLAGS := -fpermissive
+
+SYMBOLS := TRUE
+
 TARGET = clockwork_gui
 
-all: $(TARGET)
 
-$(TARGET): $(OBJS)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LDFLAGS)
-
-clean:
-	rm -f $(TARGET) $(OBJS)
-
-test: test_date
-	./test_date
-
-test_date: src/core/HebrewDate.cpp tests/test_date.cpp
-	$(CXX) $(CXXFLAGS) tests/test_date.cpp src/core/HebrewDate.cpp -o test_date $(LDFLAGS)
+## Include the Makefile-Engine
+DEVEL_DIRECTORY := \
+        $(shell findpaths -r "makefile_engine" B_FIND_PATH_DEVELOP_DIRECTORY)
+include $(DEVEL_DIRECTORY)/etc/makefile-engine
