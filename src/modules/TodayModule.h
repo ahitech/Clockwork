@@ -15,7 +15,7 @@ static const char* kDeskbarItemName = "clockwork";
 
 class TodayModuleView : public BView {
 public:
-    TodayModuleView();
+    TodayModuleView(BRect);
     TodayModuleView(BMessage* archive);
     virtual ~TodayModuleView();
 

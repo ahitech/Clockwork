@@ -8,17 +8,24 @@
 #include <View.h>
 #include <StringView.h>
 #include <ctime>
+#include <stdio.h>
+#include <cstdio>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TodayModuleView"
 
-TodayModuleView::TodayModuleView()
-    : BView("TodayModuleView", B_WILL_DRAW),
+
+
+TodayModuleView::TodayModuleView(BRect frame)
+    : BView(frame, 
+    		"TodayModuleView", 
+    		B_FOLLOW_H_CENTER | B_FOLLOW_V_CENTER,
+    		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_PULSE_NEEDED),
       fToday(std::time(nullptr), true)
 {
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     UpdateContent();
-    BRect frame = this->Frame();
+//    BRect frame = this->Frame();
     
     if (1) {
     	frame.OffsetTo(B_ORIGIN);
@@ -33,7 +40,6 @@ TodayModuleView::TodayModuleView(BMessage* archive)
     : BView(archive),
       fToday(std::time(nullptr), true)
 {
-	archive->PrintToStream();
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     SetFlags(Flags() | B_DRAW_ON_CHILDREN);
     UpdateContent();
@@ -174,8 +180,10 @@ status_t TodayModuleView::Archive(BMessage* into, bool deep) const {
 }
 
 BArchivable* TodayModuleView::Instantiate(BMessage* from) {
-    if (validate_instantiation(from, "TodayModuleView"))
+    if (validate_instantiation(from, "TodayModuleView")) {
+    	fprintf (stderr, "Instantiate: creating app from archive\n");
         return new TodayModuleView(from);
+    }
     return nullptr;
 }
 
