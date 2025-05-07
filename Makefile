@@ -4,6 +4,7 @@ APP_MIME_SIG = application/x-vnd.clockwork-app
 
 SRCS = \
     src/core/HebrewDate.cpp \
+    src/core/ResizableBox.cpp	\
     src/modules/TodayModule.cpp \
     src/main.cpp
 
