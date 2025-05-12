@@ -37,6 +37,13 @@ ResizableBox::ResizableBox(border_style border, BView* child) :
 	_LoadCursors()
 }
 
+ResizableBox::~ResizableBox()
+{
+	if (fGrabCursor) delete fGrabCursor;
+	if (fGrabbingCursor) delete fGrabbingCursor;
+	if (fDefaultCursor) delete fDefaultCursor;
+}
+
 void ResizableBox::MessageReceived(BMessage *in)
 {
 	if (in) {

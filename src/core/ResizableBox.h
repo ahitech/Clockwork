@@ -39,7 +39,7 @@ public:
 	ResizableBox(border_style border, BView* child = NULL);
 
 	// Functions that possibly may be reimplemented, but for now they are inherited
-	virtual ~ResizableBox() = default;
+	virtual ~ResizableBox();
 	
 	// Reimplemented functions
 	virtual void MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage);
