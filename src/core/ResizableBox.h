@@ -25,6 +25,7 @@ class ResizableBox :
 	public BBox
 {
 public:
+	// Constructors
 	ResizableBox(BRect frame,
 		const char* name,
 		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
@@ -35,12 +36,18 @@ public:
 		border_style border = B_FANCY_BORDER,
 		BView* child = NULL);
 	ResizableBox(border_style border, BView* child = NULL);
-		
+
+	// Functions that possibly may be reimplemented, but for now they are inherited
 	virtual ~ResizableBox() = default;
 	
-	virtual void MouseMoved(BPoint point, uint32 transit, const BMessage* dragMessage);
+	// Reimplemented functions
+	virtual void MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage);
+	virtual void MessageReceived(BMessage* message);
+	virtual void MouseDown(BPoint where);
+	virtual void MouseUp(BPoint where);
 
 private:
+	bool borderDraggingMode;
 
 };
 
