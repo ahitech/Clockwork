@@ -5,36 +5,44 @@
 
 #include "ResizableBox.h"
 
+#include <stdio.h>
+
+#include <Application.h>
+#include <Window.h>
+
 ResizableBox::ResizableBox(BRect frame,
 		const char* name,
 		uint32 resizingMode,
 		uint32 flags,
 		border_style border) :
 	BBox(frame, name, resizingMode, flags, border),
-	borderDraggingMode(false)
+	fBorderDraggingMode(false)
 {
-	
+	_InitCursors();
 }
-
-
 
 ResizableBox::ResizableBox(const char* name,
 		uint32 flags,
 		border_style border,
 		BView* child) :
 	BBox(name, flags, border, child),
-	borderDraggingMode(false)
+	fBorderDraggingMode(false)
 {
-	
+	_InitCursors();
 }
-
-
 
 ResizableBox::ResizableBox(border_style border, BView* child) :
 	BBox(border, child),
-	borderDraggingMode(false)
+	fBorderDraggingMode(false)
 {
-	
+	_InitCursors();
+}
+
+ResizableBox::~ResizableBox()
+{
+	if (fCursorDefault) delete fCursorDefault;
+	if (fCursorGrabReady) delete fCursorGrabReady;
+	if (fCursorGrabbing) delete fCursorGrabbing;
 }
 
 void ResizableBox::MessageReceived(BMessage *in)
@@ -51,11 +59,25 @@ void ResizableBox::MessageReceived(BMessage *in)
 
 void ResizableBox::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
-	switch (code)
+	BRect bounds = Bounds();
+	float borderWidth = this->TopBorderOffset();
+	
+	if (code == B_ENTERED_VIEW || code == B_INSIDE_VIEW)
 	{
-		B_ENTERED_VIEW:		// We need to change the cursor
-				
-		
+			if ((where.x <= borderWidth)					||
+				(bounds.Width() - where.x <= borderWidth)	||
+				(where.y <= borderWidth)					||
+				(bounds.Height() - where.y <= borderWidth))
+			{	
+				be_app->SetCursor(fCursorGrabReady);
+			}
+			else
+			{
+				be_app->SetCursor(fCursorDefault);
+			}
+	}
+	else if (code == B_EXITED_VIEW) {
+			be_app->SetCursor(fCursorDefault);
 	};
 	
 	BBox::MouseMoved(where, code, dragMessage);									
@@ -76,4 +98,11 @@ void ResizableBox::MouseDown(BPoint where)
 void ResizableBox::MouseUp(BPoint where)
 {
 	
+}
+
+void ResizableBox::_InitCursors()
+{
+	fCursorDefault = new BCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
+	fCursorGrabReady = new BCursor(B_CURSOR_ID_GRAB);
+	fCursorGrabbing = new BCursor(B_CURSOR_ID_GRABBING);
 }

@@ -25,7 +25,15 @@ TodayModuleView::TodayModuleView(BRect frame)
 {
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     UpdateContent();
-//    BRect frame = this->Frame();
+    
+    BRect resizableBoxFrame = frame;
+    resizableBoxFrame.InsetBy(20, 20);
+
+	fBox = new ResizableBox(resizableBoxFrame, "Box");
+	
+	fBox->SetLabel("Try it");
+	
+	AddChild(fBox);
     
     if (1) {
     	frame.OffsetTo(B_ORIGIN);
@@ -38,14 +46,17 @@ TodayModuleView::TodayModuleView(BRect frame)
 
 TodayModuleView::TodayModuleView(BMessage* archive)
     : BView(archive),
-      fToday(std::time(nullptr), true)
+      fToday(std::time(nullptr), true),
+      fBox(NULL)
 {
     SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     SetFlags(Flags() | B_DRAW_ON_CHILDREN);
     UpdateContent();
 }
 
-TodayModuleView::~TodayModuleView() {}
+TodayModuleView::~TodayModuleView() {
+	if (fBox) { fBox->RemoveSelf(); delete fBox; }
+}
 
 void TodayModuleView::MouseDown(BPoint where)
 {

@@ -9,6 +9,7 @@
 #include <Dragger.h>
 #include <Window.h>
 #include "../core/HebrewDate.h"
+#include "../core/ResizableBox.h"
 
 const uint32 kMsgToggleLiveInDeskbar = 'LIDB';
 static const char* kDeskbarItemName = "clockwork";
@@ -34,6 +35,7 @@ private:
     BString fParsha;
     BString fHoliday;
 	BDragger* fDragger = NULL;
+	ResizableBox* fBox;
 	
     void UpdateContent();
 };

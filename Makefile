@@ -52,8 +52,6 @@ COMPILER_FLAGS := -fpermissive
 
 SYMBOLS := TRUE
 
-TARGET = clockwork_gui
-
 
 ## Include the Makefile-Engine
 DEVEL_DIRECTORY := \
