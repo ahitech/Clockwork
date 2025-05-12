@@ -11,7 +11,6 @@
 #define RESIZABLE_BOX_H
 
 #include <Box.h>
-#include <Cursor.h>
 #include <SupportDefs.h>
 
 /**
@@ -39,7 +38,7 @@ public:
 	ResizableBox(border_style border, BView* child = NULL);
 
 	// Functions that possibly may be reimplemented, but for now they are inherited
-	virtual ~ResizableBox();
+	virtual ~ResizableBox() = default;
 	
 	// Reimplemented functions
 	virtual void MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage);
@@ -47,13 +46,9 @@ public:
 	virtual void MouseDown(BPoint where);
 	virtual void MouseUp(BPoint where);
 
-protected:
-	bool 	fBorderDraggingMode;
-	BCursor fGrabCursor;
-	BCursor fGrabbingCursor;
-	BCursor fDefaultCursor;
-	
-	void _LoadCursors();
+private:
+	bool borderDraggingMode;
+
 };
 
 
