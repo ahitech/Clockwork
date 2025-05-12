@@ -11,6 +11,7 @@
 #define RESIZABLE_BOX_H
 
 #include <Box.h>
+#include <Cursor.h>
 #include <SupportDefs.h>
 
 /**
@@ -46,9 +47,13 @@ public:
 	virtual void MouseDown(BPoint where);
 	virtual void MouseUp(BPoint where);
 
-private:
-	bool borderDraggingMode;
-
+protected:
+	bool 	fBorderDraggingMode;
+	BCursor fGrabCursor;
+	BCursor fGrabbingCursor;
+	BCursor fDefaultCursor;
+	
+	void _LoadCursors();
 };
 
 
