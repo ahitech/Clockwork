@@ -48,7 +48,7 @@ SYMBOLS := TRUE
 
 DEBUGGER := TRUE
 
-COMPILER_FLAGS := -fpermissive
+COMPILER_FLAGS := -fpermissive -std=c++20
 
 SYMBOLS := TRUE
 

@@ -14,6 +14,51 @@
 #include <Cursor.h>
 #include <SupportDefs.h>
 
+/** 
+ * @brief	This enum answers the question whether the cursor is near the border
+ *			of the ResizableBox.
+ * @details	The value is set by the function that checks the position of the cursor.
+ *			It is used later for deciding how the cursor which is probably hovering
+ *			over the border should be changed, if at all.
+ */
+enum Border {
+	FAR_FROM_BORDER = 0,
+	TOP,
+	BOTTOM,
+	LEFT,
+	RIGHT,
+	TOP_LEFT,
+	TOP_RIGHT,
+	BOTTOM_LEFT,
+	BOTTOM_RIGHT
+};
+
+/**
+ * @brief	This structure prepares all cursors that can be used by the ResizableBox.
+ * @details	The usage is purely for clarity of the code and for optimizing the runtime
+ *			latency by a fraction of msec. End user would probably not feel the
+ *			difference between dynamically allocating all resources at the beginning
+ *			of the program's run or when it's already running.
+ */
+struct Cursors {
+	BCursor* defaultCursor;
+	BCursor* draggable;
+	BCursor* dragging;		//!< It is advised not to use it, as it gives no
+							//	 sense of direction of resizing
+	BCursor* draggingN;
+	BCursor* draggingS;
+	BCursor* draggingW;
+	BCursor* draggingE;
+	BCursor* draggingNW;
+	BCursor* draggingNE;
+	BCursor* draggingSW;
+	BCursor* draggingSE;
+	
+	Cursors();
+	virtual ~Cursors();
+};
+	
+
 /**
  * @brief	Resizable BBox class.
  * @detals	The main idea is to create a BBox with visible borders that
@@ -50,11 +95,9 @@ public:
 protected:
 	bool fBorderDraggingMode;
 	
-	BCursor* fCursorDefault;
-	BCursor* fCursorGrabReady;
-	BCursor* fCursorGrabbing;
+	Cursors cursors; 
 	
-	void _InitCursors(void);
+	enum Border _IsCursorNearTheBorder();
 
 };
 

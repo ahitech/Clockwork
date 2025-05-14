@@ -10,6 +10,39 @@
 #include <Application.h>
 #include <Window.h>
 
+#pragma region // -----==< Implementation of the struct Cursors >==-----
+Cursors::Cursors()
+{
+	defaultCursor 	= new BCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
+	draggable		= new BCursor(B_CURSOR_ID_GRAB);
+	dragging	 	= new BCursor(B_CURSOR_ID_GRABBING);
+	draggingN 		= new BCursor(B_CURSOR_ID_RESIZE_NORTH);
+	draggingS 		= new BCursor(B_CURSOR_ID_RESIZE_SOUTH);
+	draggingW 		= new BCursor(B_CURSOR_ID_RESIZE_WEST);
+	draggingE 		= new BCursor(B_CURSOR_ID_RESIZE_EAST);
+	draggingNW 		= new BCursor(B_CURSOR_ID_RESIZE_NORTH_WEST);
+	draggingNE 		= new BCursor(B_CURSOR_ID_RESIZE_NORTH_EAST);
+	draggingSW 		= new BCursor(B_CURSOR_ID_RESIZE_SOUTH_WEST);
+	draggingSE 		= new BCursor(B_CURSOR_ID_RESIZE_SOUTH_EAST);
+}
+
+Cursors::~Cursors()
+{
+	if (defaultCursor) 		delete defaultCursor;
+	if (draggable) 			delete draggable;
+	if (dragging) 			delete dragging;
+	if (draggingN)			delete draggingN;
+	if (draggingS)			delete draggingS;
+	if (draggingW)			delete draggingW;
+	if (draggingE)			delete draggingE;
+	if (draggingNW)			delete draggingNW;
+	if (draggingNE)			delete draggingNE;
+	if (draggingSW)			delete draggingSW;
+	if (draggingSE)			delete draggingSE;
+}
+#pragma endregion
+
+#pragma region;	// -----==< Public functions of ResizableBox >==-----
 ResizableBox::ResizableBox(BRect frame,
 		const char* name,
 		uint32 resizingMode,
@@ -18,7 +51,7 @@ ResizableBox::ResizableBox(BRect frame,
 	BBox(frame, name, resizingMode, flags, border),
 	fBorderDraggingMode(false)
 {
-	_InitCursors();
+	
 }
 
 ResizableBox::ResizableBox(const char* name,
@@ -28,21 +61,19 @@ ResizableBox::ResizableBox(const char* name,
 	BBox(name, flags, border, child),
 	fBorderDraggingMode(false)
 {
-	_InitCursors();
+	
 }
 
 ResizableBox::ResizableBox(border_style border, BView* child) :
 	BBox(border, child),
 	fBorderDraggingMode(false)
 {
-	_InitCursors();
+	
 }
 
 ResizableBox::~ResizableBox()
 {
-	if (fCursorDefault) delete fCursorDefault;
-	if (fCursorGrabReady) delete fCursorGrabReady;
-	if (fCursorGrabbing) delete fCursorGrabbing;
+	
 }
 
 void ResizableBox::MessageReceived(BMessage *in)
@@ -69,15 +100,15 @@ void ResizableBox::MouseMoved(BPoint where, uint32 code, const BMessage* dragMes
 				(where.y <= borderWidth)					||
 				(bounds.Height() - where.y <= borderWidth))
 			{	
-				be_app->SetCursor(fCursorGrabReady);
+				be_app->SetCursor(cursors.draggable);
 			}
 			else
 			{
-				be_app->SetCursor(fCursorDefault);
+				be_app->SetCursor(cursors.defaultCursor);
 			}
 	}
 	else if (code == B_EXITED_VIEW) {
-			be_app->SetCursor(fCursorDefault);
+			be_app->SetCursor(cursors.defaultCursor);
 	};
 	
 	BBox::MouseMoved(where, code, dragMessage);									
@@ -99,10 +130,11 @@ void ResizableBox::MouseUp(BPoint where)
 {
 	
 }
+#pragma endregion
 
-void ResizableBox::_InitCursors()
+#pragma region	// -----==< Protected functions of ResizableBox >==----- 
+enum Border ResizableBox::_IsCursorNearTheBorder()
 {
-	fCursorDefault = new BCursor(B_CURSOR_ID_SYSTEM_DEFAULT);
-	fCursorGrabReady = new BCursor(B_CURSOR_ID_GRAB);
-	fCursorGrabbing = new BCursor(B_CURSOR_ID_GRABBING);
+	return FAR_FROM_BORDER;
 }
+#pragma endregion
