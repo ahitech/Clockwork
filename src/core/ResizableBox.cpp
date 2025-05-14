@@ -95,17 +95,7 @@ void ResizableBox::MouseMoved(BPoint where, uint32 code, const BMessage* dragMes
 	
 	if (code == B_ENTERED_VIEW || code == B_INSIDE_VIEW)
 	{
-			if ((where.x <= borderWidth)					||
-				(bounds.Width() - where.x <= borderWidth)	||
-				(where.y <= borderWidth)					||
-				(bounds.Height() - where.y <= borderWidth))
-			{	
-				be_app->SetCursor(cursors.draggable);
-			}
-			else
-			{
-				be_app->SetCursor(cursors.defaultCursor);
-			}
+		be_app->SetCursor(_WhichCursorSuits(_IsCursorNearTheBorder(where)));
 	}
 	else if (code == B_EXITED_VIEW) {
 			be_app->SetCursor(cursors.defaultCursor);
@@ -133,8 +123,60 @@ void ResizableBox::MouseUp(BPoint where)
 #pragma endregion
 
 #pragma region	// -----==< Protected functions of ResizableBox >==----- 
-enum Border ResizableBox::_IsCursorNearTheBorder()
+enum Border ResizableBox::_IsCursorNearTheBorder(BPoint in)
 {
-	return FAR_FROM_BORDER;
+	bool N = false, S = false, E = false, W = false;
+	BRect bounds = Bounds();
+	float threshold = this->TopBorderOffset();
+	enum Border toReturn = FAR_FROM_BORDER;
+	
+	if (in.x <= threshold) { W = true; toReturn = LEFT; }
+	if (bounds.Width() - in.x <= threshold) { E = true; toReturn = RIGHT; }
+	if (in.y <= threshold) { N = true; toReturn = TOP; }
+	if (bounds.Height() - in.y <= threshold) { S = true; toReturn = BOTTOM; }
+	
+	if (N & W) { toReturn = TOP_LEFT; }
+	if (N & E) { toReturn = TOP_RIGHT; }
+	if (S & W) { toReturn = BOTTOM_LEFT; }
+	if (S & E) { toReturn = BOTTOM_RIGHT; }
+	
+	return toReturn;
+}
+
+BCursor* ResizableBox::_WhichCursorSuits(enum Border in)
+{
+	BCursor* toReturn = NULL;
+	
+	if (!fBorderDraggingMode && in != FAR_FROM_BORDER)
+	{
+		toReturn = cursors.draggable;
+	}
+	else
+	{
+		switch (in)
+		{
+			case TOP:
+				toReturn = cursors.draggingN; break;
+			case BOTTOM:
+				toReturn = cursors.draggingS; break;
+			case LEFT:
+				toReturn = cursors.draggingW; break;
+			case RIGHT:
+				toReturn = cursors.draggingE; break;
+			case TOP_LEFT:
+				toReturn = cursors.draggingNW; break;
+			case TOP_RIGHT:
+				toReturn = cursors.draggingNE; break;
+			case BOTTOM_LEFT:
+				toReturn = cursors.draggingSW; break;
+			case BOTTOM_RIGHT:
+				toReturn = cursors.draggingSE; break;
+			case FAR_FROM_BORDER:		// Intentional fall-through
+			default:
+				toReturn = cursors.defaultCursor; break;
+		};
+	}
+	
+	return toReturn;
 }
 #pragma endregion

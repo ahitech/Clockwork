@@ -97,7 +97,8 @@ protected:
 	
 	Cursors cursors; 
 	
-	enum Border _IsCursorNearTheBorder();
+	enum Border _IsCursorNearTheBorder(BPoint in);
+	BCursor* _WhichCursorSuits(enum Border in);
 
 };
 
