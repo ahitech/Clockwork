@@ -5,9 +5,13 @@
 
 #include "ResizableBox.h"
 
+#include <cstdio>
 #include <stdio.h>
 
+#include <Alert.h>
 #include <Application.h>
+#include <Dragger.h>
+#include <StringView.h>
 #include <Window.h>
 
 #pragma region // -----==< Implementation of the struct Cursors >==-----
@@ -51,7 +55,7 @@ ResizableBox::ResizableBox(BRect frame,
 	BBox(frame, name, resizingMode, flags, border),
 	fBorderDraggingMode(false)
 {
-	
+	_AddDragger();
 }
 
 ResizableBox::ResizableBox(const char* name,
@@ -61,14 +65,24 @@ ResizableBox::ResizableBox(const char* name,
 	BBox(name, flags, border, child),
 	fBorderDraggingMode(false)
 {
-	
+
 }
 
 ResizableBox::ResizableBox(border_style border, BView* child) :
 	BBox(border, child),
 	fBorderDraggingMode(false)
 {
-	
+
+}
+
+ResizableBox::ResizableBox(BMessage *from)
+	: BBox(from)
+{
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+    // Пример: вложенный текстовый лейбл в центр
+    BRect bounds = Bounds().InsetByCopy(10, 10);
+    AddChild(new BStringView(bounds, "label", "Resizable Replicant!"));
 }
 
 ResizableBox::~ResizableBox()
@@ -90,15 +104,12 @@ void ResizableBox::MessageReceived(BMessage *in)
 
 void ResizableBox::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
-	BRect bounds = Bounds();
-	float borderWidth = this->TopBorderOffset();
-	
 	if (code == B_ENTERED_VIEW || code == B_INSIDE_VIEW)
 	{
-		be_app->SetCursor(_WhichCursorSuits(_IsCursorNearTheBorder(where)));
+		this->SetViewCursor(_WhichCursorSuits(_IsCursorNearTheBorder(where)));
 	}
 	else if (code == B_EXITED_VIEW) {
-			be_app->SetCursor(cursors.defaultCursor);
+		this->SetViewCursor(cursors.defaultCursor);
 	};
 	
 	BBox::MouseMoved(where, code, dragMessage);									
@@ -120,6 +131,33 @@ void ResizableBox::MouseUp(BPoint where)
 {
 	
 }
+
+status_t ResizableBox::Archive(BMessage *into, bool deep) const
+{
+	if (! into) {
+		return B_BAD_INDEX;
+	}
+	status_t toReturn = BBox::Archive(into, deep);
+	if (B_OK == toReturn)
+	{
+		toReturn = into->AddString("add_on", "application/x-vnd.clockwork-app");
+	}
+	if (B_OK == toReturn)
+	{
+		toReturn = into->AddString("class", "ResizableBox");
+	}
+	return toReturn;
+}
+
+BArchivable* ResizableBox::Instantiate(BMessage *from)
+{
+//	if (!validate_instantiation(from, "ResizableBox"))
+//	{
+//		return NULL;
+//	}
+	return new ResizableBox(from);
+}
+
 #pragma endregion
 
 #pragma region	// -----==< Protected functions of ResizableBox >==----- 
@@ -146,12 +184,14 @@ enum Border ResizableBox::_IsCursorNearTheBorder(BPoint in)
 BCursor* ResizableBox::_WhichCursorSuits(enum Border in)
 {
 	BCursor* toReturn = NULL;
-	
+
+#if 0	
 	if (!fBorderDraggingMode && in != FAR_FROM_BORDER)
 	{
 		toReturn = cursors.draggable;
 	}
 	else
+#endif
 	{
 		switch (in)
 		{
@@ -179,4 +219,12 @@ BCursor* ResizableBox::_WhichCursorSuits(enum Border in)
 	
 	return toReturn;
 }
+
+void ResizableBox::_AddDragger()
+{
+	BRect dragRect(Bounds().Width() - 7, Bounds().Height() - 7,
+                   Bounds().Width(), Bounds().Height());
+    AddChild(new BDragger(dragRect, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM));
+}
 #pragma endregion
+

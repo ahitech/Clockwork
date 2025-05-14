@@ -11,7 +11,7 @@ public:
     void ReadyToRun() override {
         BRect frame(100, 100, 300, 200);
         BWindow* window = new BWindow(frame, "Clockwork — Today", B_TITLED_WINDOW,
-        B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
+        	B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
 
         BRect viewFrame = window->Bounds();
         fprintf(stderr, "Window bounds: %.1f x %.1f", viewFrame.Width(), viewFrame.Height());

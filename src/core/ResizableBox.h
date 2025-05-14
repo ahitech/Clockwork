@@ -82,8 +82,8 @@ public:
 		border_style border = B_FANCY_BORDER,
 		BView* child = NULL);
 	ResizableBox(border_style border, BView* child = NULL);
+	ResizableBox(BMessage* from);
 
-	// Functions that possibly may be reimplemented, but for now they are inherited
 	virtual ~ResizableBox();
 	
 	// Reimplemented functions
@@ -91,16 +91,20 @@ public:
 	virtual void MessageReceived(BMessage* message);
 	virtual void MouseDown(BPoint where);
 	virtual void MouseUp(BPoint where);
+	
+	virtual BArchivable* Instantiate(BMessage* archive);
+	virtual status_t	 Archive(BMessage* into, bool deep) const;
 
 protected:
 	bool fBorderDraggingMode;
-	
 	Cursors cursors; 
 	
-	enum Border _IsCursorNearTheBorder(BPoint in);
-	BCursor* _WhichCursorSuits(enum Border in);
+	virtual enum Border _IsCursorNearTheBorder(BPoint in);
+	virtual BCursor* _WhichCursorSuits(enum Border in);
+	virtual void _AddDragger();
 
 };
+
 
 
 #endif // RESIZABLE_BOX_H
