@@ -53,8 +53,10 @@ ResizableBox::ResizableBox(BRect frame,
 		uint32 flags,
 		border_style border) :
 	BBox(frame, name, resizingMode, flags, border),
+	cursors(NULL),
 	fBorderDraggingMode(false)
 {
+	cursors = new Cursors();
 	_AddDragger();
 }
 
@@ -63,31 +65,39 @@ ResizableBox::ResizableBox(const char* name,
 		border_style border,
 		BView* child) :
 	BBox(name, flags, border, child),
+	cursors(NULL),
 	fBorderDraggingMode(false)
 {
-
+	cursors = new Cursors();
+	_AddDragger();
 }
 
 ResizableBox::ResizableBox(border_style border, BView* child) :
 	BBox(border, child),
+	cursors(NULL),
 	fBorderDraggingMode(false)
 {
-
+	cursors = new Cursors();
+	_AddDragger();
 }
 
 ResizableBox::ResizableBox(BMessage *from)
-	: BBox(from)
+	: BBox(from),
+	  fBorderDraggingMode(false),
+	  cursors(NULL)
 {
+	cursors = new Cursors();
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	_AddDragger();
 
     // Пример: вложенный текстовый лейбл в центр
-    BRect bounds = Bounds().InsetByCopy(10, 10);
-    AddChild(new BStringView(bounds, "label", "Resizable Replicant!"));
+//    BRect bounds = Bounds().InsetByCopy(10, 10);
+//    AddChild(new BStringView(bounds, "label", "Resizable Replicant!"));
 }
 
 ResizableBox::~ResizableBox()
 {
-	
+	if (cursors) delete cursors;
 }
 
 void ResizableBox::MessageReceived(BMessage *in)
@@ -109,7 +119,7 @@ void ResizableBox::MouseMoved(BPoint where, uint32 code, const BMessage* dragMes
 		this->SetViewCursor(_WhichCursorSuits(_IsCursorNearTheBorder(where)));
 	}
 	else if (code == B_EXITED_VIEW) {
-		this->SetViewCursor(cursors.defaultCursor);
+		this->SetViewCursor(cursors->defaultCursor);
 	};
 	
 	BBox::MouseMoved(where, code, dragMessage);									
@@ -151,10 +161,11 @@ status_t ResizableBox::Archive(BMessage *into, bool deep) const
 
 BArchivable* ResizableBox::Instantiate(BMessage *from)
 {
-//	if (!validate_instantiation(from, "ResizableBox"))
-//	{
-//		return NULL;
-//	}
+//	if (from) from->PrintToStream();
+	if (!validate_instantiation(from, "ResizableBox"))
+	{
+		return NULL;
+	}
 	return new ResizableBox(from);
 }
 
@@ -196,24 +207,24 @@ BCursor* ResizableBox::_WhichCursorSuits(enum Border in)
 		switch (in)
 		{
 			case TOP:
-				toReturn = cursors.draggingN; break;
+				toReturn = cursors->draggingN; break;
 			case BOTTOM:
-				toReturn = cursors.draggingS; break;
+				toReturn = cursors->draggingS; break;
 			case LEFT:
-				toReturn = cursors.draggingW; break;
+				toReturn = cursors->draggingW; break;
 			case RIGHT:
-				toReturn = cursors.draggingE; break;
+				toReturn = cursors->draggingE; break;
 			case TOP_LEFT:
-				toReturn = cursors.draggingNW; break;
+				toReturn = cursors->draggingNW; break;
 			case TOP_RIGHT:
-				toReturn = cursors.draggingNE; break;
+				toReturn = cursors->draggingNE; break;
 			case BOTTOM_LEFT:
-				toReturn = cursors.draggingSW; break;
+				toReturn = cursors->draggingSW; break;
 			case BOTTOM_RIGHT:
-				toReturn = cursors.draggingSE; break;
+				toReturn = cursors->draggingSE; break;
 			case FAR_FROM_BORDER:		// Intentional fall-through
 			default:
-				toReturn = cursors.defaultCursor; break;
+				toReturn = cursors->defaultCursor; break;
 		};
 	}
 	

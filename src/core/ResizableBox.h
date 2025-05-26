@@ -67,7 +67,7 @@ struct Cursors {
  *			a replicant, which, in turn, makes possible creating replicants with
  *			size independent of the size of the other views or windows of the program.
  */
-class ResizableBox :
+class _EXPORT ResizableBox :
 	public BBox
 {
 public:
@@ -97,7 +97,7 @@ public:
 
 protected:
 	bool fBorderDraggingMode;
-	Cursors cursors; 
+	Cursors* cursors; 
 	
 	virtual enum Border _IsCursorNearTheBorder(BPoint in);
 	virtual BCursor* _WhichCursorSuits(enum Border in);
