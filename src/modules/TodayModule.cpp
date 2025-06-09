@@ -10,11 +10,34 @@
 #include <ctime>
 #include <stdio.h>
 #include <cstdio>
+#include <string>
+#include <unordered_map>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TodayModuleView"
 
-const char* sivan = "Sivan";
+
+std::unordered_map<std::string, std::string> months =
+	{	{"", 			B_TRANSLATE("") },
+		{"Sivan", 		B_TRANSLATE("Sivan") },
+		{"Tishrei", 	B_TRANSLATE("Tishrei") },
+		{"Cheshvan",	B_TRANSLATE("Cheshvan") },
+		{"Kislev",		B_TRANSLATE("Kislev") },
+		{"Tevet",		B_TRANSLATE("Tevet") },
+		{"Shevat",		B_TRANSLATE("Shevat") },
+		{"Adar",		B_TRANSLATE("Adar") },
+		{"Nisan",		B_TRANSLATE("Nisan") },
+		{"Iyar",		B_TRANSLATE("Iyar") },
+		{"Sivan",		B_TRANSLATE("Sivan") },
+		{"Tammuz",		B_TRANSLATE("Tammuz") },
+		{"Av",			B_TRANSLATE("Av") },
+		{"Elul",		B_TRANSLATE("Elul") },
+		{"Adar I",		B_TRANSLATE("Adar I") },
+		{"Adar II",		B_TRANSLATE("Adar II") }
+	};
+
+
+const char* sivan = B_TRANSLATE("Sivan");
 
 
 
