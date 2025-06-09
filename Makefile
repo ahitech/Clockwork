@@ -32,7 +32,7 @@ SYSTEM_INCLUDE_PATHS =  \
 LOCAL_INCLUDE_PATHS =   src/core		\
 						lib				\
 						src/modules
-LOCALES = en he ru eo
+LOCALES = en ru
 
 #	Specify the level of optimization that you want. Specify either NONE (O0),
 #	SOME (O1), FULL (O2), or leave blank (for the default optimization level).
@@ -53,9 +53,6 @@ DEBUGGER := TRUE
 COMPILER_FLAGS := -fpermissive -std=c++20
 
 SYMBOLS := TRUE
-
-CATKEYS = locales/Clockwork.catkeys
-CATALOGS = Clockwork.catalog
 
 
 ## Include the Makefile-Engine

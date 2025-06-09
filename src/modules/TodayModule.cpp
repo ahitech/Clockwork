@@ -14,6 +14,8 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TodayModuleView"
 
+const char* sivan = "Sivan";
+
 
 
 TodayModuleView::TodayModuleView(BRect frame)
@@ -33,7 +35,7 @@ TodayModuleView::TodayModuleView(BRect frame)
 	
 	fBox->SetLabel("Try it");
 	
-	AddChild(fBox);
+//	AddChild(fBox);
     
     if (1) {
     	frame.OffsetTo(B_ORIGIN);
@@ -42,6 +44,11 @@ TodayModuleView::TodayModuleView(BRect frame)
 		fDragger = new BDragger(frame, this, B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
     	AddChild(fDragger);
     }
+    
+    BStringView *stringView = new BStringView(BRect(10, 20, 100, 35),
+    	"stringView", B_TRANSLATE("String"));
+    	
+    AddChild(stringView);
 }
 
 TodayModuleView::TodayModuleView(BMessage* archive)
@@ -76,6 +83,15 @@ void TodayModuleView::MouseDown(BPoint where)
 	BWindow* window = Window();
 	if (window != NULL) {
 		// inside Clockwork app
+		BMenuItem* item;
+		BDragger *dragger = NULL;
+		int i = 0;
+		while (dragger == NULL) {
+			dragger = dynamic_cast<BDragger*>(ChildAt(i++));
+		}
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Remove replicant"),
+				new BMessage(B_TRASH_TARGET)));
+			item->SetTarget(dragger);
 	} else {
 		// Replicated
 		BMenuItem* item;
