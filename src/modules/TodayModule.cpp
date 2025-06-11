@@ -41,6 +41,7 @@ const char* sivan = B_TRANSLATE("Sivan");
 */
 
 
+
 TodayModuleView::TodayModuleView(BRect frame)
     : BView(frame, 
     		"TodayModuleView", 

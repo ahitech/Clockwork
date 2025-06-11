@@ -37,7 +37,7 @@ std::unordered_map<std::string, std::string> months =
 	};
 
 HebrewDate::HebrewDate(int hYear, int hMonth, int hDay)
-    : hYear_(hYear), hMonth_(hMonth), hDay_(hDay), diaspora_(true) {}
+    : hYear_(hYear), hMonth_(hMonth), hDay_(hDay), diaspora_(false) {}
 
 HebrewDate::HebrewDate(std::time_t gTime, bool diaspora)
     : diaspora_(diaspora) {
