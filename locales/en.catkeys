@@ -1,18 +1,18 @@
-1	English	application/x-vnd.clockwork-app	1904656826
-String	TodayModuleView		Строка
-Av	TodayModuleView		Av
-Remove replicant	TodayModuleView		Убрать репликант
-Iyar	TodayModuleView		Iyar
-Tammuz	TodayModuleView		Tammuz
-Shevat	TodayModuleView		Shevat
-Kislev	TodayModuleView		Kislev
-Tevet	TodayModuleView		Tevet
-Adar	TodayModuleView		Adar
-Adar I	TodayModuleView		Adar I
-Sivan	TodayModuleView		Сиван
-Nisan	TodayModuleView		Nisan
-Cheshvan	TodayModuleView		Cheshvan
-Adar II	TodayModuleView		Adar II
-Tishrei	TodayModuleView		Tishrei
-	TodayModuleView		
-Elul	TodayModuleView		Elul
+1	English	application/x-vnd.clockwork-app	291967329
+String	TodayModuleView		String
+Remove replicant	TodayModuleView		Remove replicant
+Shevat	HebrewDate		Shevat
+Adar I	HebrewDate		Adar I
+Sivan	HebrewDate		Sivan
+Nisan	HebrewDate		Nisan
+Av	HebrewDate		Av
+Tevet	HebrewDate		Tevet
+Adar	HebrewDate		Adar
+Elul	HebrewDate		Elul
+Tishrei	HebrewDate		Tishrei
+	HebrewDate		
+Adar II	HebrewDate		Adar II
+Kislev	HebrewDate		Kislev
+Cheshvan	HebrewDate		Cheshvan
+Tammuz	HebrewDate		Tammuz
+Iyar	HebrewDate		Iyar

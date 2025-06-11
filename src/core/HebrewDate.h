@@ -15,6 +15,8 @@ public:
     int Day() const;
     int Month() const;
     int Year() const;
+    
+    std::string HebrewMonthName() const;
 
     std::string ToStringShort() const;
     std::string ToParsha() const;

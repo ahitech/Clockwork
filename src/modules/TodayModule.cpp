@@ -16,7 +16,7 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "TodayModuleView"
 
-
+/*
 std::unordered_map<std::string, std::string> months =
 	{	{"", 			B_TRANSLATE("") },
 		{"Sivan", 		B_TRANSLATE("Sivan") },
@@ -38,7 +38,7 @@ std::unordered_map<std::string, std::string> months =
 
 
 const char* sivan = B_TRANSLATE("Sivan");
-
+*/
 
 
 TodayModuleView::TodayModuleView(BRect frame)
