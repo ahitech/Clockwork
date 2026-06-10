@@ -8,20 +8,22 @@
 #include <Window.h>
 
 
-class MoonModule : public BView {
+class MoonModule : public BBox {
 	public:
-		virtual MoonModule();
+		MoonModule(BRect frame);
 		~MoonModule();
 	
 		virtual void MessageReceived(BMessage* in) {};
 		virtual void ResizeTo(float width, float height) {};
+		virtual void AttachedToWindow() {};
+		virtual void Draw(BRect updateRect);
 	
 	private:
-		BBitmap* fMoonPicture;
+		BBitmap*	fMoonPicture;
+		BBox*		fOutBox;
 		
-	
-		virtual BBox* 		CreateBBox();
 		virtual BBitmap*	LoadMoonPicture(const char* filePath);
+		virtual void 		DrawMoonPicture();
 };
 
 #endif // __MOON_MODULE_H__
