@@ -13,7 +13,7 @@ public:
     	
     	// Задать предпочтительный язык
     	BLocaleRoster* be_locale_roster = BLocaleRoster::Default();
-    	be_locale_roster->SetPreferredLanguages("ru");
+//    	be_locale_roster->SetPreferredLanguages("ru");
     	
         BRect frame(100, 100, 300, 200);
         BWindow* window = new BWindow(frame, "Clockwork — Today", B_TITLED_WINDOW,
