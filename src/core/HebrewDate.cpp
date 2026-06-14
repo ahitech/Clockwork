@@ -53,6 +53,20 @@ int HebrewDate::Day() const { return hDay_; }
 int HebrewDate::Month() const { return hMonth_; }
 int HebrewDate::Year() const { return hYear_; }
 
+unsigned int HebrewDate::TotalDaysInThisMonth() const {
+	HebrewDate hDate(std::time(nullptr));
+	unsigned int days = hDate.Day();
+	unsigned int nextDay = days;
+	unsigned int i = 1;
+	while (1) {
+		HebrewDate hDate(std::time(nullptr) + i*3600*24, true);
+		nextDay = hDate.Day();
+		if (nextDay == 1) { break; }
+		else { days++; i++; }
+	}
+	return days;
+}
+
 std::string HebrewDate::ToStringShort() const {
     char* month_name = hdate_get_hebrew_month_string(hMonth_, HDATE_SHORT_FLAG);
     std::ostringstream oss;

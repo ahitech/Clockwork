@@ -16,6 +16,8 @@ public:
     int Month() const;
     int Year() const;
     
+    unsigned int TotalDaysInThisMonth() const;
+    
     std::string HebrewMonthName() const;
 
     std::string ToStringShort() const;
