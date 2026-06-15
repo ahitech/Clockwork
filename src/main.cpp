@@ -26,9 +26,15 @@ public:
         BRect viewFrame = window->Bounds();
         fprintf(stderr, "Window bounds: %.1f x %.1f", viewFrame.Width(), viewFrame.Height());
 
+		BView* mainView = new BView(viewFrame, "main view",
+			B_FOLLOW_ALL_SIDES,
+			B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
+		mainView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		window->AddChild(mainView);
+
 		BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 		layout->SetInsets(10, 10);
-		window->SetLayout(layout);
+		mainView->SetLayout(layout);
 
         TodayModuleView* view = new TodayModuleView(viewFrame);
         view->MoveTo(0, 0);

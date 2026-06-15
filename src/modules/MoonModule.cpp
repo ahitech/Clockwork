@@ -53,6 +53,11 @@ BBitmap* MoonModule::LoadMoonPicture(const char* filePath)
 
 
 void MoonModule::Draw(BRect updateRect) {
+	rgb_color ui_color = HighColor();
+	SetHighColor(ViewColor());
+	FillRect(this->Bounds());
+	SetHighColor(ui_color);
+	BBox::Draw(updateRect);
 	if (fMoonPicture) DrawMoonPicture();
 }
 
@@ -64,11 +69,11 @@ void MoonModule::DrawMoonPicture()
 		return;
 	}
 	BRect bounds = this->Bounds(); 
-	bounds.InsetBy(10, 10);
+	bounds.InsetBy(10, 20);
 	float minSide = (bounds.Width() > bounds.Height()) ?
 					bounds.Height() : bounds.Width();
-	float xOffset = 10 + (bounds.Width() - minSide) / 2.0f;
-	float yOffset = 10 + (bounds.Height() - minSide) / 2.0f;
+	float xOffset = 20 + (bounds.Width() - minSide) / 2.0f;
+	float yOffset = 20 + (bounds.Height() - minSide) / 2.0f;
 	BRect targetSquare(	xOffset, yOffset,
 						xOffset + minSide, yOffset + minSide);
 	SetDrawingMode(B_OP_ALPHA);
@@ -82,11 +87,9 @@ void MoonModule::DrawMoonPicture()
 void MoonModule::AttachedToWindow()
 {
 	BView* parent = Parent();
-	if (parent)
-	{
-		SetViewColor (B_TRANSPARENT_COLOR);
-	}
-	BView::AttachedToWindow();	
+	if ( Parent() )
+      SetViewColor(Parent()->ViewColor());
+	BBox::AttachedToWindow();	
 }
 
 unsigned int	MoonModule::GetHebrewDate()
