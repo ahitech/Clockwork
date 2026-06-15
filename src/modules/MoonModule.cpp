@@ -76,7 +76,7 @@ void MoonModule::DrawMoonPicture()
 	DrawBitmap(fMoonPicture, fMoonPicture->Bounds(), targetSquare);
 	SetDrawingMode(B_OP_COPY);
 	
-	DrawShadow(bounds);
+	DrawShadow(targetSquare);
 }
 
 void MoonModule::AttachedToWindow()
@@ -102,72 +102,67 @@ unsigned int	MoonModule::GetTotalDaysInCurrentHebrewMonth()
 	return toReturn;
 }
 
-BShape*		MoonModule::CreateShadowShape(BRect bounds)
+BShape*
+MoonModule::CreateShadowShape(BRect bounds)
 {
 	unsigned int currentDay = GetHebrewDate();
 	unsigned int totalDays = GetTotalDaysInCurrentHebrewMonth();
-	// When date is 15, the moon is full = no shadow at all
-	if (currentDay == 0 || currentDay == 15 || totalDays == 0 ||
-		currentDay > totalDays)
-	{
+
+	if (currentDay == 0 || currentDay == 15 || totalDays == 0
+			|| currentDay > totalDays) {
 		return NULL;
 	}
-	float minSize = (bounds.Width() < bounds.Height()) ?
-		bounds.Width() : bounds.Height();
+
+	float minSize = (bounds.Width() < bounds.Height())
+		? bounds.Width() : bounds.Height();
+
 	float radius = minSize / 2.0f;
-	BPoint northPole = BPoint((bounds.Width() + 20) / 2.0f, 10);
-	BPoint southPole = BPoint((bounds.Width() + 20) / 2.0f, bounds.Height() + 10);
-	float centerX = bounds.left + 10 + bounds.Width() / 2.0f ;
-	float centerY = bounds.top + 10 + bounds.Height() / 2.0f;
-	
-	// How many steps are there on the moon's face, 15 or 14?
-	float k = 0.0f;
-	bool isWaxing = (currentDay < 15);
+
+	float centerX = bounds.left + bounds.Width() / 2.0f;
+	float centerY = bounds.top + bounds.Height() / 2.0f;
+
+	BPoint northPole(centerX, centerY - radius);
+	BPoint southPole(centerX, centerY + radius);
+
+	bool isWaxing = currentDay < 15;
+
+	float k;
 	if (isWaxing) {
-		k = -1.0f + (2.0f / 15.0f) * currentDay;
+		k = 1.0f - (2.0f * (currentDay - 1) / 14.0f);
 	} else {
 		unsigned int daysAfterFull = currentDay - 15;
 		unsigned int secondHalfLength = totalDays - 15;
-		k = 1.0f - (2.0f / (float)secondHalfLength) * daysAfterFull;
+		k = 1.0f - (2.0f * daysAfterFull / (float)secondHalfLength);
 	}
-	
-	// Where the terminator crosses the equator?
-	float terminatorX = centerX + (k * radius);
-	
-	const float kBezierCircle = 0.552f;
-	float circleControlOffset = radius * kBezierCircle;
-	
-	// Internal arc (crossing the face of the moon)
-	BShape *shadowShape = new BShape();
+
+	const float kHalfCircleBezier = 4.0f / 3.0f;
+
+	float terminatorControlX = centerX + k * radius * kHalfCircleBezier;
+
+	BShape* shadowShape = new BShape();
+
 	shadowShape->MoveTo(northPole);
-	BPoint terminatorControl1(terminatorX, centerY - circleControlOffset);
-	BPoint terminatorControl2(terminatorX, centerY + circleControlOffset);
-	BPoint bezierPoints[3] = { 	terminatorControl1,
-								terminatorControl2,
-								southPole 
-							 };
-	shadowShape->BezierTo(bezierPoints);
-	
-	// External arc (around the side of the moon)
-	BPoint edgeControl1, edgeControl2;
-	if (isWaxing) {
-		edgeControl1 = BPoint(centerX - circleControlOffset,
-							  centerY + circleControlOffset);
-		edgeControl2 = BPoint(centerX - circleControlOffset,
-							  centerY - circleControlOffset);
-	} else {
-		edgeControl1 = BPoint(centerX + circleControlOffset,
-							  centerY + circleControlOffset);
-		edgeControl2 = BPoint(centerX + circleControlOffset,
-							  centerY - circleControlOffset);
-	}
-	BPoint edgePoints[3] = { edgeControl1,
-							 edgeControl2,
-							 northPole 
-							};
+
+	BPoint terminatorPoints[3] = {
+		BPoint(terminatorControlX, northPole.y),
+		BPoint(terminatorControlX, southPole.y),
+		southPole
+	};
+	shadowShape->BezierTo(terminatorPoints);
+
+	float edgeControlX = isWaxing
+		? centerX - radius * kHalfCircleBezier
+		: centerX + radius * kHalfCircleBezier;
+
+	BPoint edgePoints[3] = {
+		BPoint(edgeControlX, southPole.y),
+		BPoint(edgeControlX, northPole.y),
+		northPole
+	};
 	shadowShape->BezierTo(edgePoints);
-	
+
 	shadowShape->Close();
+
 	return shadowShape;
 }
 
