@@ -18,20 +18,68 @@ MoonModule::MoonModule(BRect frame) :
 		 "Moon View",
 		 B_FOLLOW_H_CENTER | B_FOLLOW_V_CENTER,
 		 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS ),
-	fOutBox(nullptr),
 	fMoonPicture(nullptr)
 {
-	fMoonPicture = LoadMoonPicture("Moon.png");
+	Init();
+	AddDragger();
+}
+
+MoonModule::MoonModule (BMessage* in) :
+	BBox(in)
+{
+	Init();
+}
+
+void MoonModule::Init() {
+	SetViewColor(B_TRANSPARENT_COLOR);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fMoonPicture = LoadMoonPicture("/boot/home/Development/Clockwork/Moon.png");
 	this->SetLabel(B_TRANSLATE("Current moon phase"));	
 	DrawMoonPicture();
-	
-	GetHebrewDate();
-	GetTotalDaysInCurrentHebrewMonth();
 }
 
 MoonModule::~MoonModule() {
 	if (fMoonPicture != nullptr) {
 	}
+}
+
+BArchivable* MoonModule::Instantiate (BMessage* in) {
+	FILE* log = fopen ("/boot/home/moon_replicant.log", "a");
+	fprintf(log, "----------\n");
+	if (validate_instantiation(in, "MoonModule")) {
+		fprintf(log, "Validate instantiation OK\n");
+		const char* className;
+		for (int32 i = 0; in->FindString("class", i, &className) == B_OK; i++)
+		{
+			fprintf(log, "class[%ld] = %s\n", i, className);
+		}
+		in->FindString("add_on", &className);
+		fprintf(log, "add_on = %s\n", className);
+		fclose(log);
+		return new MoonModule(in);
+	}
+	fclose(log);
+	return NULL;
+}
+
+status_t MoonModule::Archive(BMessage* out, bool deep) const
+{
+	status_t toReturn = BBox::Archive(out, deep);
+	fprintf(stderr, "BBox::Archive -> %s\n", strerror(toReturn));
+	if (toReturn != B_OK) { return toReturn; }
+	out->AddString("add_on", "application/x-vnd.clockwork-app");
+	out->AddString("class", "MoonModule");
+	return B_OK;
+}
+
+void MoonModule::AddDragger() {
+	BRect rect(this->Bounds());
+	rect.left = rect.right - 7;
+	rect.top = rect.bottom - 7;
+	BDragger* dragger = new BDragger (rect, this,
+			B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM,
+			B_WILL_DRAW);
+	this->AddChild(dragger);
 }
 
 BBitmap* MoonModule::LoadMoonPicture(const char* filePath)
@@ -111,8 +159,11 @@ MoonModule::CreateShadowShape(BRect bounds)
 	unsigned int currentDay = GetHebrewDate();
 	unsigned int totalDays = GetTotalDaysInCurrentHebrewMonth();
 
-	if (currentDay == 0 || currentDay == 15 || totalDays == 0
-			|| currentDay > totalDays) {
+	if (currentDay == 0 ||
+		currentDay == 15 || 	// Full moon, no shade needed
+		totalDays == 0	||
+		currentDay > totalDays) 
+	{
 		return NULL;
 	}
 
@@ -131,7 +182,8 @@ MoonModule::CreateShadowShape(BRect bounds)
 
 	float k;
 	if (isWaxing) {
-		k = 1.0f - (2.0f * (currentDay - 1) / 14.0f);
+		// k = 1.0f - (2.0f * (currentDay - 0.5) / 14.0f);
+		k = 1.0f - (2.0f * (currentDay) / 15.0f);
 	} else {
 		unsigned int daysAfterFull = currentDay - 15;
 		unsigned int secondHalfLength = totalDays - 15;
@@ -186,3 +238,4 @@ void MoonModule::DrawShadow(BRect bounds) {
 	this->SetDrawingMode(oldMode);
 	this->SetHighColor(oldColor);
 }
+
