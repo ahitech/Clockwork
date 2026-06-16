@@ -21,9 +21,12 @@ class MoonModule : public BBox {
 		virtual void AttachedToWindow() override;
 		virtual void Draw(BRect updateRect) override;
 		virtual status_t Archive(BMessage* out, bool deep = true) const;
+		virtual void Pulse();
 	
 	private:
 		BBitmap*	fMoonPicture;
+		uint		day;
+		uint		monthDays;
 		
 		BBitmap*	LoadMoonPicture(const char* filePath);
 		void 		DrawMoonPicture();

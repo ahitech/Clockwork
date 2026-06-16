@@ -8,6 +8,7 @@ SRCS = \
     src/core/ResizableBox.cpp	\
     src/modules/TodayModule.cpp \
     src/modules/MoonModule.cpp	\
+    src/modules/NextHoliday.cpp \
     src/main.cpp
 
 LIBS = 	hdate \

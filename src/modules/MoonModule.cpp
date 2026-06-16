@@ -17,16 +17,22 @@ MoonModule::MoonModule(BRect frame) :
 	BBox(frame,
 		 "Moon View",
 		 B_FOLLOW_H_CENTER | B_FOLLOW_V_CENTER,
-		 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS ),
-	fMoonPicture(nullptr)
+		 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_PULSE_NEEDED ),
+	fMoonPicture(nullptr),
+	day(0),
+	monthDays(0)
 {
 	Init();
 	AddDragger();
 }
 
 MoonModule::MoonModule (BMessage* in) :
-	BBox(in)
+	BBox(in),
+	fMoonPicture(NULL),
+	day(0),
+	monthDays(0)
 {
+	SetFlags(Flags() | B_PULSE_NEEDED);
 	Init();
 }
 
@@ -35,6 +41,8 @@ void MoonModule::Init() {
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fMoonPicture = LoadMoonPicture("/boot/home/Development/Clockwork/Moon.png");
 	this->SetLabel(B_TRANSLATE("Current moon phase"));	
+	day = GetHebrewDate();
+	monthDays = GetTotalDaysInCurrentHebrewMonth();
 	DrawMoonPicture();
 }
 
@@ -44,21 +52,9 @@ MoonModule::~MoonModule() {
 }
 
 BArchivable* MoonModule::Instantiate (BMessage* in) {
-	FILE* log = fopen ("/boot/home/moon_replicant.log", "a");
-	fprintf(log, "----------\n");
 	if (validate_instantiation(in, "MoonModule")) {
-		fprintf(log, "Validate instantiation OK\n");
-		const char* className;
-		for (int32 i = 0; in->FindString("class", i, &className) == B_OK; i++)
-		{
-			fprintf(log, "class[%ld] = %s\n", i, className);
-		}
-		in->FindString("add_on", &className);
-		fprintf(log, "add_on = %s\n", className);
-		fclose(log);
 		return new MoonModule(in);
 	}
-	fclose(log);
 	return NULL;
 }
 
@@ -137,7 +133,10 @@ void MoonModule::AttachedToWindow()
 	BView* parent = Parent();
 	if ( Parent() )
       SetViewColor(Parent()->ViewColor());
-	BBox::AttachedToWindow();	
+	BBox::AttachedToWindow();
+	if (Window() != NULL) {
+		Window()->SetPulseRate(60 * 1000000LL);	// Once a minute
+	}
 }
 
 unsigned int	MoonModule::GetHebrewDate()
@@ -239,3 +238,11 @@ void MoonModule::DrawShadow(BRect bounds) {
 	this->SetHighColor(oldColor);
 }
 
+void MoonModule::Pulse() {
+	uint newDay = GetHebrewDate();
+	uint newDaysInMonth = GetTotalDaysInCurrentHebrewMonth();
+	if (newDay != day ||
+		newDaysInMonth != monthDays) {
+		Invalidate();
+	}
+}

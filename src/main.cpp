@@ -19,11 +19,11 @@ public:
     	BLocaleRoster* be_locale_roster = BLocaleRoster::Default();
 //    	be_locale_roster->SetPreferredLanguages("ru");
     	
-        BRect frame(100, 100, 300, 400);
+        BRect frame(100, 100, 400, 400);
         BWindow* window = new BWindow(frame, "Clockwork — Today", B_TITLED_WINDOW,
         	B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
 
-        BRect viewFrame = window->Bounds();
+        BRect viewFrame = (window->Bounds());
         fprintf(stderr, "Window bounds: %.1f x %.1f", viewFrame.Width(), viewFrame.Height());
 
 		BView* mainView = new BView(viewFrame, "main view",
@@ -33,22 +33,22 @@ public:
 		window->AddChild(mainView);
 
 		BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
-		layout->SetInsets(10, 10);
+		layout->SetInsets(10, 10, 20, 10);
 		mainView->SetLayout(layout);
 
-        TodayModuleView* view = new TodayModuleView(viewFrame);
-        view->MoveTo(0, 0);
-        view->ResizeTo(viewFrame.Width(), 20);
+        TodayModuleView* view = new TodayModuleView(BRect(0, 0, 300, 100));
+//        view->MoveTo(0, 0);
+//        view->ResizeTo(viewFrame.Width(), 20);
         
         BLayoutItem* layoutItem = layout->AddView(view);
-        layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_TOP));
+        layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
         
         MoonModule* moonModule = new MoonModule(viewFrame);
         moonModule->MoveTo(0, viewFrame.Height());
         moonModule->ResizeTo(viewFrame.Width(), viewFrame.Height());
 		
 		layoutItem = layout->AddView(moonModule);
-		layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_TOP));
+		layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_BOTTOM));
         
         window->Show();
     }
