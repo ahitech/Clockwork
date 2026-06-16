@@ -6,6 +6,7 @@ TARGET_DIR := .
 SRCS = \
     src/core/HebrewDate.cpp \
     src/core/ResizableBox.cpp	\
+    src/core/JewishCalendar.cpp	\
     src/modules/TodayModule.cpp \
     src/modules/MoonModule.cpp	\
     src/modules/NextHoliday.cpp \
