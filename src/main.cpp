@@ -8,6 +8,7 @@
 
 #include "modules/TodayModule.h"
 #include "modules/MoonModule.h"
+#include "modules/NextHoliday.h"
 
 class ClockworkApp : public BApplication {
 public:
@@ -36,12 +37,14 @@ public:
 		layout->SetInsets(10, 10, 20, 10);
 		mainView->SetLayout(layout);
 
-        TodayModuleView* view = new TodayModuleView(BRect(0, 0, 300, 100));
+//        TodayModuleView* view = new TodayModuleView(BRect(0, 0, 300, 100));
 //        view->MoveTo(0, 0);
 //        view->ResizeTo(viewFrame.Width(), 20);
+
+		NextHolidayModule* view = new NextHolidayModule(BRect(0, 0, 300, 100));
         
         BLayoutItem* layoutItem = layout->AddView(view);
-        layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER));
+        layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_TOP));
         
         MoonModule* moonModule = new MoonModule(viewFrame);
         moonModule->MoveTo(0, viewFrame.Height());
