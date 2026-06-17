@@ -15,11 +15,34 @@
  *	\brief		Struct that represents Gregorian date
  *	\details	Under the hood the normalization is performed
  *				using struct tm, mktime and localtime_r.
+ *	\note		HebrewDate struct is defined in HebrewDate.h
  */
 struct GregorianDate {
 	uint year;	// Full year, e. g. 2026
 	uint month;	// 1 = January, 12 = December
 	uint day;	// 1 .. 31
+
+	GregorianDate() = default;
+
+	GregorianDate(uint y, uint m, uint d)
+		: year(y), month(m), day(d)
+	{ }
+
+	explicit GregorianDate(const struct tm& t)
+		: year(t.tm_year + 1900),
+		  month(t.tm_mon + 1),
+		  day(t.tm_mday)
+	{ }
+	
+	explicit GregorianDate(std::time_t t)
+	{
+		struct tm result;
+		localtime_r(&t, &result);
+	
+		year  = result.tm_year + 1900;
+		month = result.tm_mon + 1;
+		day   = result.tm_mday;
+	}
 };
 
 	GregorianDate GregorianDateFromTm(const struct tm&);
@@ -31,27 +54,18 @@ struct GregorianDate {
  *	\brief
  */
 
-struct HolidayFilter {
-	bool includeMajor,
-	bool includeMinor,
-	bool includeFasts,
-	bool includeModernIsraeli,
-	bool includeRoshHodesh,
-	bool includeHolHaMoed
-};
-
-
-
 class JewishCalendar {
 public:
 	JewishCalendar (bool diaspora = true);
-	
-	HebrewDate HebrewDateFromGregorian(const GregorianDate& date) const;
-	bool IsHoliday(const GregorianDate &gregorianDate,
-			const HolidayFilter& filter);
-			
-	
-			
+
+	HebrewDate Today() const;
+	HebrewDate ToHebrewDate(const GregorianDate& date) const;
+	GregorianDate	ToGregorianDate(const HebrewDate& date) const;
+	GregorianDate 	AddDays(const GregorianDate& in,
+										  int days) const;
+	int HolidayId(const GregorianDate& date) const;		
+	int HolidayType(const GregorianDate& date) const;
+	int DaysInHebrewMonth(uint year, uint month) const;
 
 private:
 	bool _diaspora;

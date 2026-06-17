@@ -1,6 +1,9 @@
 #include "NextHoliday.h"
 
+#include <GroupLayout.h>
+#include <GroupLayoutBuilder.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <MenuItem.h>
 #include <Message.h>
 #include <Font.h>
@@ -69,12 +72,54 @@ void NextHolidayModule::Init() {
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	this->SetLabel(B_TRANSLATE("Next Hebrew Holiday"));
 	
+	SetFlags(Flags() | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
+		| B_PULSE_NEEDED);
+
+	fToday = GregorianDate(std::time(nullptr));
+	fSelectedOffset = 0;
+	BRect rect(0, 0, 25, 40);
 	
+	fPrevHolidayButton = new BButton(rect,
+		"Prev Holiday",
+		"<",
+		new BMessage(PrevHolidayMessage));
+	fPrevHolidayButton->SetTarget(this);
+		
+	fNextHolidayButton = new BButton(rect,
+		"Next Holiday",
+		">",
+		new BMessage(NextHolidayMessage));
+	fNextHolidayButton->SetTarget(this);
+	
+	fFirstLine = new BStringView(rect,
+		"First Line",
+		"First Line");
+	fSecondLine = new BStringView(rect,
+		"Second Line",
+		"Second Line");
+	fThirdLine = new BStringView(rect,
+		"Third Line",
+		"Third Line");
+	
+	BGroupLayout *boxLayout = BLayoutBuilder::Group<>(B_HORIZONTAL)
+		.SetInsets(10, 10, 10, 10)
+		.Add(fPrevHolidayButton)
+		.Add(BGroupLayoutBuilder(B_VERTICAL, 10)
+			.Add(fFirstLine)
+			.Add(fSecondLine)
+			.Add(fThirdLine)
+		)
+		.Add(fNextHolidayButton)
+	;
+
+	this->AddChild(boxLayout->View());
+
+	UpdateCurrentHoliday();
+}
 	
 	
 //	BGroupLayout* layout = new BLayoutBuilder::Group<>(B_VERTICAL)
-	
-}
+
 
 void NextHolidayModule::AttachedToWindow()
 {
@@ -87,3 +132,16 @@ void NextHolidayModule::AttachedToWindow()
 	}
 }
 
+void NextHolidayModule::Pulse()
+{
+	GregorianDate today(std::time(nullptr));
+
+	if (today.year != fToday.year
+			|| today.month != fToday.month
+			|| today.day != fToday.day) {
+		fToday = today;
+		fSelectedOffset = 0;
+		UpdateCurrentHoliday();
+		Invalidate();
+	}
+}
