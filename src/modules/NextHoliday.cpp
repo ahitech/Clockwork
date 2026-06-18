@@ -129,7 +129,7 @@ void NextHolidayModule::Init()
 
 	AddChild(contentView);
 	
-	UpdateCurrentHoliday();
+	UpdateCurrentHoliday(Direction::NEXT);
 }	
 //	BGroupLayout* layout = new BLayoutBuilder::Group<>(B_VERTICAL)
 
@@ -154,14 +154,14 @@ void NextHolidayModule::Pulse()
 			|| today.day != fToday.day) {
 		fToday = today;
 		fSelectedOffset = 0;
-		UpdateCurrentHoliday();
+		UpdateCurrentHoliday(Direction::NEXT);
 		Invalidate();
 	}
 }
 
-void NextHolidayModule::UpdateCurrentHoliday()
+void NextHolidayModule::UpdateCurrentHoliday(Direction dir)
 {
-	int holidayId = FindNextHolidayId(fToday);
+	int holidayId = FindNextHolidayId(fNextHolidayDate, dir);
 
 	if (holidayId == 0) {
 		fFirstLine->SetText(B_TRANSLATE("No holiday found"));
@@ -172,7 +172,7 @@ void NextHolidayModule::UpdateCurrentHoliday()
 
 }
 
-int NextHolidayModule::FindNextHolidayId(const GregorianDate& from) const
+int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction direction) const
 {
 	fNextHolidayDate = from;
 	std::time_t now = std::time(nullptr);
@@ -184,7 +184,13 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from) const
 	
 	do
 	{
-		tempTM.tm_mday++;
+		int dateChange = 0;
+		if (direction == Direction::PREVIOUS) {
+			dateChange = -1;
+		} else if (direction == Direction::NEXT) {
+			dateChange = 1;
+		}
+		tempTM.tm_mday += dateChange;
 		//counter++;
 		timeSinceEpoch = mktime(&tempTM);
 		hdate_set_gdate(&tempHDate,

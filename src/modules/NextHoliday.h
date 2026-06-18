@@ -19,6 +19,11 @@
 const uint32	PrevHolidayMessage	= "pHDM";
 const uint32	NextHolidayMessage 	= "nHDM";
 
+enum class Direction {
+	PREVIOUS = -1
+	,NEXT = 1
+};
+
 class NextHolidayModule : public BBox {
 public:
     NextHolidayModule(BRect frame);
@@ -31,14 +36,14 @@ public:
     virtual void Pulse();
     
     // TODO:
-    void UpdateCurrentHoliday();
+    void UpdateCurrentHoliday(Direction);
     void MouseDown(BPoint where) override {};
     
 
 private:
 	void Init();
 	void AddDragger();
-	int FindNextHolidayId(const GregorianDate& from) const;
+	int FindNextHolidayId(const GregorianDate& from, Direction) const;
 	const char* HolidayName(int holidayId) const;
 	
 	GregorianDate fToday;
