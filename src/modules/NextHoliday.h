@@ -31,15 +31,18 @@ public:
     virtual void Pulse();
     
     // TODO:
-    void UpdateCurrentHoliday() {};
+    void UpdateCurrentHoliday();
     void MouseDown(BPoint where) override {};
     
 
 private:
 	void Init();
 	void AddDragger();
+	int FindNextHolidayId(const GregorianDate& from) const;
+	const char* HolidayName(int holidayId) const;
 	
 	GregorianDate fToday;
+	GregorianDate	fNextHolidayDate;
 	int fSelectedOffset;	// 0 - nearest holiday, 1 - next, etc.
 	JewishCalendar fJewishCalendar;
 	rgb_color fViewColor;

@@ -80,7 +80,7 @@ GregorianDate JewishCalendar::AddDays(const GregorianDate& in, int days) const
 	tmDate.tm_mon  = in.month - 1;
 	tmDate.tm_mday = in.day + days;
 
-	// Полдень безопаснее полуночи при переходах DST.
+	// Noon is better than midnight when DST is involved.
 	tmDate.tm_hour = 12;
 	tmDate.tm_isdst = -1;
 
@@ -94,7 +94,7 @@ int JewishCalendar::HolidayId(const GregorianDate& date) const
 {
 	hdate_struct hdate;
 	hdate_set_gdate(&hdate, date.day, date.month, date.year);
-	return hdate_get_holyday(&hdate, _diaspora ? 1 : 0);
+	return hdate_get_holyday_type(hdate_get_holyday(&hdate, _diaspora ? 1 : 0));
 }
 
 int JewishCalendar::HolidayType(const GregorianDate& date) const
