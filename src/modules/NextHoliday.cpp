@@ -193,19 +193,18 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from) const
 						tempTM.tm_year + 1900);
 		holiday = hdate_get_holyday (&tempHDate, 1);		// Diaspora
 		
+		printf("Holiday = %d\n", holiday);
+		
 	} while (holiday == 0);
-
-	if (holiday != 0) {
-		fFirstLine->SetText(hdate_string (HDATE_STRING_HOLIDAY, 
-									holiday,
-									0,
-									HDATE_STRING_LOCAL));
+		
+		
+		fFirstLine->SetText(holidayNames[holiday].second);
 		char buffer[30];
 		sprintf(buffer, "On %d.%d.%d", tempTM.tm_mday, tempTM.tm_mon+1,
 			tempTM.tm_year+1900);
 		fSecondLine->SetText(buffer);
-		return;
-	}
+		
+	
 	return holiday;
 }
 

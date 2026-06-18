@@ -11,6 +11,50 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "JewishCalendar"
 
+std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
+	{0,		{NO_HOLIDAY, 		BString(B_TRANSLATE("No holiday"))}},
+	{1, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Rosh HaShana first day"))}},
+	{2, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Rosh HaShana second day"))}},
+	{3, 	{TZOM, 				BString(B_TRANSLATE("Tzom Gedaliah"))}},
+	{4, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Yom_Kippur"))}},
+	{5,		{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Sukkot"))}},
+	{6, 	{HOL_HAMOED, 		BString(B_TRANSLATE("Hol HaMoed Sukkot"))}},
+	{7, 	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Hoshana Raba"))}},
+	{8, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Simchat Torah"))}},
+	{9, 	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Hanukkah"))}},
+	{10,	{TZOM, 				BString(B_TRANSLATE("Asara BeTevet"))}},
+	{11,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Tu BiShvat"))}},
+	{12,	{TZOM, 				BString(B_TRANSLATE("Taanit Ester"))}},
+	{13,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Purim"))}},
+	{14,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Shushan_Purim"))}},
+	{15,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Pesach"))}},
+	{16,	{HOL_HAMOED,		BString(B_TRANSLATE("Hol HaMoed Pesach"))}},
+	{17,	{CIVIL,				BString(B_TRANSLATE("Yom HaAtzmaut"))}},
+	{18,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Lag BaOmer"))}},
+	{19,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Erev Shavuot"))}},
+	{20,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Shavuot"))}},
+	{21,	{TZOM,				BString(B_TRANSLATE("Tzom Tammuz"))}},
+	{22,	{TZOM,				BString(B_TRANSLATE("Tish'a BeAv"))}},
+	{23,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Tu BeAv"))}},
+	{24,	{CIVIL,				BString(B_TRANSLATE("Yom HaShoah"))}},
+	{25,	{CIVIL,				BString(B_TRANSLATE("Yom HaZikaron"))}},
+	{26,	{CIVIL,				BString(B_TRANSLATE("Yom Yerushalayim"))}},
+	{27,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Shmini Atzeret"))}},
+	{28,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Shevi'i shel Pesach"))}},
+	{29,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Acharon shel Pesach"))}},
+	{30,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Shavuot second day"))}},
+	{31,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Sukkot second day"))}},
+	{32,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Pesach second day"))}},
+	{33,	{CIVIL,				BString(B_TRANSLATE("Family Day"))}},
+	{34,	{CIVIL,				BString(B_TRANSLATE("Memorial day for fallen whose place of burial is unknown"))}},
+	{35,	{MINOR,				BString(B_TRANSLATE("Yitzhak Rabin memorial day"))}},
+	{36,	{MINOR,				BString(B_TRANSLATE("Zeev Zhabotinsky day"))}}, 
+	{37,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Erev Yom Kippur"))}},
+	{38,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Erev Pesach"))}},
+	{39,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Erev Sukkot"))}}
+};
+
+
 GregorianDate GregorianDateFromTm(const struct tm& t)
 {
 	return {
@@ -90,11 +134,20 @@ GregorianDate JewishCalendar::AddDays(const GregorianDate& in, int days) const
 }
 
 
+/**
+ *	\brief		Returns ID of the day as defined in the libhdate.
+ *	\param[in]	date	Gregorian date for the translation.
+ *	\returns	0 if the date is not holiday, 1 .. 37 otherwise.
+ */
 int JewishCalendar::HolidayId(const GregorianDate& date) const
 {
-	hdate_struct hdate;
-	hdate_set_gdate(&hdate, date.day, date.month, date.year);
-	return hdate_get_holyday_type(hdate_get_holyday(&hdate, _diaspora ? 1 : 0));
+	hdate_struct tempHDate;
+	hdate_set_gdate(&tempHDate,
+					date.day,
+					date.month,
+					date.year);
+	int holiday = hdate_get_holyday (&tempHDate, _diaspora);
+	return holiday;
 }
 
 int JewishCalendar::HolidayType(const GregorianDate& date) const

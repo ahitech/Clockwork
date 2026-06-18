@@ -9,7 +9,11 @@
 #include "HebrewDate.h"
 
 #include <ctime>
+#include <map>
+#include <utility>
+#include <Catalog.h>
 #include <SupportDefs.h>
+
 
 /**
  *	\brief		Struct that represents Gregorian date
@@ -53,6 +57,18 @@ struct GregorianDate {
 /**
  *	\brief
  */
+enum HolidayType {
+	 NO_HOLIDAY = 0
+	,TZOM
+	,RELIGIOUS_MAJOR
+	,RELIGIOUS_MINOR
+	,HOL_HAMOED
+	,CIVIL
+	,MINOR	
+};
+ 
+extern std::map<int, std::pair<enum HolidayType, BString>> holidayNames;
+
 
 class JewishCalendar {
 public:
