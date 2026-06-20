@@ -2,6 +2,7 @@
 
 #include <Box.h>
 #include <Button.h>
+#include <CheckBox.h>
 #include <Deskbar.h>
 #include <Message.h>
 #include <StringView.h>
@@ -58,5 +59,7 @@ private:
 	BStringView* fFirstLine;
 	BStringView* fSecondLine;
 	BStringView* fThirdLine;
+	BStringView* fFourthLine;
+	BCheckBox*	 fUpdateOnMidnight;
 };
 

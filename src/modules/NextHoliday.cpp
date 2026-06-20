@@ -89,7 +89,11 @@ void NextHolidayModule::Init()
 
 	fFirstLine = new BStringView("First Line", "First Line");
 	fSecondLine = new BStringView("Second Line", "Second Line");
-	fThirdLine = new BStringView("Third Line", "Third Line");
+	fThirdLine = new BStringView("Third Line", "Type: x");
+	fFourthLine = new BStringView("Fourth Line", "In x days");
+	fUpdateOnMidnight = new BCheckBox("Recalculate at midnight",
+			B_TRANSLATE("Recalculate at midnight"),
+			NULL);
 
 	BRect content = Bounds();
 	content.InsetBy(6, 6);
@@ -122,6 +126,8 @@ void NextHolidayModule::Init()
 	textLayout->AddView(fFirstLine);
 	textLayout->AddView(fSecondLine);
 	textLayout->AddView(fThirdLine);
+	textLayout->AddView(fFourthLine);
+	textLayout->AddView(fUpdateOnMidnight);
 	
 	mainLayout->AddView(textView, 1.0f);
 	
@@ -154,7 +160,9 @@ void NextHolidayModule::Pulse()
 			|| today.day != fToday.day) {
 		fToday = today;
 		fSelectedOffset = 0;
-		UpdateCurrentHoliday(Direction::NEXT);
+		if (fUpdateOnMidnight->Value()) {
+			UpdateCurrentHoliday(Direction::NEXT);
+		}
 		Invalidate();
 	}
 }
@@ -180,6 +188,8 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 	localtime_r(&now, &tempTM);
 	time_t	timeSinceEpoch;
 	int holiday = 0;
+	int counter = 0;
+	char buffer[30];
 	hdate_struct tempHDate;
 	
 	do
@@ -191,7 +201,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 			dateChange = 1;
 		}
 		tempTM.tm_mday += dateChange;
-		//counter++;
+		counter++;
 		timeSinceEpoch = mktime(&tempTM);
 		hdate_set_gdate(&tempHDate,
 						tempTM.tm_mday,
@@ -203,14 +213,51 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 		
 	} while (holiday == 0);
 		
-		
-		fFirstLine->SetText(holidayNames[holiday].second);
-		char buffer[30];
-		sprintf(buffer, "On %d.%d.%d", tempTM.tm_mday, tempTM.tm_mon+1,
-			tempTM.tm_year+1900);
-		fSecondLine->SetText(buffer);
-		
+	switch (holidayNames[holiday].first) {
+		case RELIGIOUS_MAJOR:
+			sprintf(buffer, B_TRANSLATE("Judaic major"));
+			break;
+		case RELIGIOUS_MINOR:
+			sprintf(buffer, B_TRANSLATE("Judaic minor"));
+			break;
+		case TZOM:
+			sprintf(buffer, B_TRANSLATE("Religious Fast"));
+			break;
+		case HOL_HAMOED:
+			sprintf(buffer, B_TRANSLATE("Chol HaMoed"));
+			break;
+		case MINOR:
+			sprintf(buffer, B_TRANSLATE("Rememberance day"));
+			break;
+		case CIVIL:
+			sprintf(buffer, B_TRANSLATE("Civil holiday"));
+			break;
+		default:
+			sprintf(buffer, B_TRANSLATE("Not a holiday"));
+			break;
+	};
+	fSecondLine->SetText(buffer);
+			
+
+	fFirstLine->SetText(holidayNames[holiday].second);
 	
+	sprintf(buffer, "On %d.%d.%d", tempTM.tm_mday, tempTM.tm_mon+1,
+		tempTM.tm_year+1900);
+	fThirdLine->SetText(buffer);
+	
+	switch (counter) {
+		case 0: 
+			fFourthLine->SetText(B_TRANSLATE("Tonight"));
+			break;
+		case 1:
+			fFourthLine->SetText(B_TRANSLATE("Tomorrow"));
+			break;
+		default:
+			sprintf(buffer, B_TRANSLATE("In %d days"), counter);
+			fFourthLine->SetText(buffer);
+			break;
+	};		
+
 	return holiday;
 }
 
