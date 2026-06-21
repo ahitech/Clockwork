@@ -5,6 +5,7 @@
 #include <CheckBox.h>
 #include <Deskbar.h>
 #include <Message.h>
+#include <Messenger.h>
 #include <StringView.h>
 #include <View.h>
 #include <PopUpMenu.h>
@@ -17,8 +18,9 @@
 #include "../core/ResizableBox.h"
 #include "../core/JewishCalendar.h"
 
-const uint32	PrevHolidayMessage	= "pHDM";
-const uint32	NextHolidayMessage 	= "nHDM";
+const uint32	PrevHolidayMessage	= 'pHDM';
+const uint32	NextHolidayMessage 	= 'nHDM';
+const uint32	ToggleDateLanguage	= 'tDLg';
 
 enum class Direction {
 	PREVIOUS = -1
@@ -28,10 +30,15 @@ enum class Direction {
 
 class ClickableStringView : public BStringView {
 	public:
-		ClickableStringView (const char *a, const char *b) :
-			BStringView(a, b) { };
+		ClickableStringView (const char *a, const char *b, BHandler* in) :
+			BStringView(a, b),
+			target(in) { };
 		virtual ~ClickableStringView() {};
 		virtual void MouseDown(BPoint where);
+		virtual void MouseMoved(BPoint where, uint32 transit,
+			const BMessage* dragMessage);
+	private:
+		BHandler* target;
 };
 
 class NextHolidayModule : public BBox {
@@ -44,6 +51,7 @@ public:
     virtual status_t Archive(BMessage* out, bool deep = true) const;
     virtual void AttachedToWindow() override;
     virtual void Pulse();
+    virtual void MessageReceived (BMessage* in);
     
     // TODO:
     void UpdateCurrentHoliday(Direction);

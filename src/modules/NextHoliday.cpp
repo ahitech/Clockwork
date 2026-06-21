@@ -1,5 +1,8 @@
 #include "NextHoliday.h"
 
+#include <AppDefs.h>
+#include <Application.h>
+#include <Cursor.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
 #include <Catalog.h>
@@ -23,6 +26,29 @@
 void ClickableStringView::MouseDown(BPoint where) {
 	fprintf(stderr, "Clicked at %.2f, %.2f\n", where.x, where.y);
 	fflush(stderr);
+	if (Window() != nullptr && target != nullptr) {
+		BMessage* toSend = new BMessage(ToggleDateLanguage);
+		Window()->PostMessage(toSend, target);
+	}
+}
+
+void ClickableStringView::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
+{
+	switch (transit) {
+		case B_ENTERED_VIEW:
+			be_app->SetCursor(new BCursor(B_CURSOR_ID_HELP));
+			break;
+
+		case B_EXITED_VIEW:
+			be_app->SetCursor(B_CURSOR_SYSTEM_DEFAULT);
+			break;
+
+		default:
+			break;
+	}
+
+	BStringView::MouseMoved(where, transit, dragMessage);
 }
 
 
@@ -98,7 +124,7 @@ void NextHolidayModule::Init()
 	fFirstLine->SetAlignment(B_ALIGN_CENTER);
 	fSecondLine = new BStringView("Second Line", "Second Line");
 	fSecondLine->SetAlignment(B_ALIGN_CENTER);
-	fThirdLine = new ClickableStringView("Third Line", "Type: x");
+	fThirdLine = new ClickableStringView("Third Line", "Type: x", this);
 	fThirdLine->SetAlignment(B_ALIGN_CENTER);
 	fFourthLine = new BStringView("Fourth Line", "In x days");
 	fFourthLine->SetAlignment(B_ALIGN_CENTER);
@@ -392,3 +418,12 @@ const char* NextHolidayModule::HolidayName(int holidayId) const
 //	}
 }
 
+void NextHolidayModule::MessageReceived(BMessage* in) {
+	switch (in->what) {
+		case ToggleDateLanguage:
+			fprintf(stdout, "Message Received!\n");
+			fflush(stdout);
+		default:
+			BBox::MessageReceived(in);
+	}
+}
