@@ -20,6 +20,12 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "NextHolidayModule"
 
+void ClickableStringView::MouseDown(BPoint where) {
+	fprintf(stderr, "Clicked at %.2f, %.2f\n", where.x, where.y);
+	fflush(stderr);
+}
+
+
 NextHolidayModule::NextHolidayModule(BRect frame) :
 	BBox(frame,
 		 "Next Holiday",
@@ -69,6 +75,7 @@ void NextHolidayModule::AddDragger() {
 
 void NextHolidayModule::Init()
 {
+	fShownGregorianDate = false;		// We start with Gregorian date
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLabel(B_TRANSLATE("Next Hebrew Holiday"));
@@ -88,9 +95,13 @@ void NextHolidayModule::Init()
 	fNextHolidayButton->SetTarget(this);
 
 	fFirstLine = new BStringView("First Line", "First Line");
+	fFirstLine->SetAlignment(B_ALIGN_CENTER);
 	fSecondLine = new BStringView("Second Line", "Second Line");
-	fThirdLine = new BStringView("Third Line", "Type: x");
+	fSecondLine->SetAlignment(B_ALIGN_CENTER);
+	fThirdLine = new ClickableStringView("Third Line", "Type: x");
+	fThirdLine->SetAlignment(B_ALIGN_CENTER);
 	fFourthLine = new BStringView("Fourth Line", "In x days");
+	fFourthLine->SetAlignment(B_ALIGN_CENTER);
 	fUpdateOnMidnight = new BCheckBox("Recalculate at midnight",
 			B_TRANSLATE("Recalculate at midnight"),
 			NULL);
@@ -104,10 +115,6 @@ void NextHolidayModule::Init()
 	
 	contentView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     contentView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-//    SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-//	contentView->SetViewColor(255, 0, 0); // Temporary debug color.
-//	contentView->SetLowColor(255, 0, 0);
 
 	BGroupLayout* mainLayout = new BGroupLayout(B_HORIZONTAL, 8);
 	mainLayout->SetInsets(8, 10, 10, 10);
@@ -116,8 +123,6 @@ void NextHolidayModule::Init()
 	mainLayout->AddView(fPrevHolidayButton);
 	
 	BView* textView = new BView("holiday text", B_WILL_DRAW);
-//	textView->SetViewColor(255, 255, 0); // Temporary debug color.
-//	textView->SetLowColor(255, 255, 0);
 	
 	BGroupLayout* textLayout = new BGroupLayout(B_VERTICAL, 4);
 	textLayout->SetInsets(0, 0, 0, 0);
@@ -136,9 +141,7 @@ void NextHolidayModule::Init()
 	AddChild(contentView);
 	
 	UpdateCurrentHoliday(Direction::NEXT);
-}	
-//	BGroupLayout* layout = new BLayoutBuilder::Group<>(B_VERTICAL)
-
+}
 
 void NextHolidayModule::AttachedToWindow()
 {
@@ -175,9 +178,6 @@ void NextHolidayModule::UpdateCurrentHoliday(Direction dir)
 		fFirstLine->SetText(B_TRANSLATE("No holiday found"));
 		return;
 	}
-
-//	fFirstLine->SetText(HolidayName(holidayId));
-
 }
 
 int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction direction) const
@@ -212,6 +212,11 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 		printf("Holiday = %d\n", holiday);
 		
 	} while (holiday == 0);
+	
+	HebrewDate Hdate(tempHDate.hd_day, tempHDate.hd_mon, tempHDate.hd_year);
+	
+	
+	fNextHolidayDate = fJewishCalendar.ToGregorianDate(Hdate);
 		
 	switch (holidayNames[holiday].first) {
 		case RELIGIOUS_MAJOR:
@@ -256,9 +261,76 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 			sprintf(buffer, B_TRANSLATE("In %d days"), counter);
 			fFourthLine->SetText(buffer);
 			break;
-	};		
+	};	
 
 	return holiday;
+}		
+		
+void NextHolidayModule::UpdateThirdLine()
+{
+	char buffer[100];
+	if (!fShownGregorianDate)	// Hebrew date is shown
+	{
+		BString toDisplay;
+		switch (fNextHolidayDate.month) {
+			case 1:
+				toDisplay << B_TRANSLATE("January");
+				break;
+			case 2:
+				toDisplay << B_TRANSLATE("February");
+				break;
+			case 3:
+				toDisplay << B_TRANSLATE("March");
+				break;
+			case 4:
+				toDisplay << B_TRANSLATE("April");
+				break;
+			case 5:
+				toDisplay << B_TRANSLATE("May");
+				break;
+			case 6:
+				toDisplay << B_TRANSLATE("June");
+				break;
+			case 7:
+				toDisplay << B_TRANSLATE("July");
+				break;
+			case 8:
+				toDisplay << B_TRANSLATE("August");
+				break;
+			case 9:
+				toDisplay << B_TRANSLATE("September");
+				break;
+			case 10:
+				toDisplay << B_TRANSLATE("October");
+				break;
+			case 11:
+				toDisplay << B_TRANSLATE("November");
+				break;
+			case 12:
+				toDisplay << B_TRANSLATE("December");
+				break;
+			default:
+				toDisplay << B_TRANSLATE("No month");
+				break;
+		};
+		
+		
+		sprintf(buffer, B_TRANSLATE("On %s %dth %d"),
+			toDisplay.String(), fNextHolidayDate.day,
+			fNextHolidayDate.year),
+			
+		fThirdLine->SetText(buffer);
+		fShownGregorianDate = true;
+	} else {
+		// Gregorian date is shown
+		HebrewDate Hdate =
+			fJewishCalendar.ToHebrewDate(fNextHolidayDate);
+		sprintf(buffer, B_TRANSLATE("On %d of %s, %d"),
+			Hdate.Day(), JewishMonths[Hdate.Month()].name.String(),
+			Hdate.Year());
+		fThirdLine->SetText(buffer);
+		fShownGregorianDate = false;
+	}
 }
 
 const char* NextHolidayModule::HolidayName(int holidayId) const

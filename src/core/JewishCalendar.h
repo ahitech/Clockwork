@@ -11,6 +11,7 @@
 #include <ctime>
 #include <map>
 #include <utility>
+#include <String.h>
 #include <Catalog.h>
 #include <SupportDefs.h>
 
@@ -69,6 +70,13 @@ enum HolidayType {
  
 extern std::map<int, std::pair<enum HolidayType, BString>> holidayNames;
 
+struct JewishMonth {
+	uint number;
+	BString name;
+};
+
+extern JewishMonth JewishMonths[14];
+
 
 class JewishCalendar {
 public:
@@ -76,6 +84,7 @@ public:
 
 	HebrewDate Today() const;
 	HebrewDate ToHebrewDate(const GregorianDate& date) const;
+	BString		HebrewDateToString(const HebrewDate& ) const;
 	GregorianDate	ToGregorianDate(const HebrewDate& date) const;
 	GregorianDate 	AddDays(const GregorianDate& in,
 										  int days) const;

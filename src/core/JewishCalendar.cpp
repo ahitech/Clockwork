@@ -55,6 +55,23 @@ std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
 };
 
 
+JewishMonth	JewishMonths[14] = {
+	{1, BString(B_TRANSLATE("Tishrei"))},
+	{2, BString(B_TRANSLATE("Cheshvan"))},
+	{3, BString(B_TRANSLATE("Kislev"))},
+	{4, BString(B_TRANSLATE("Tevet"))},
+	{5, BString(B_TRANSLATE("Shvat"))},
+	{6, BString(B_TRANSLATE("Adar"))},
+	{7, BString(B_TRANSLATE("Nisan"))},
+	{8, BString(B_TRANSLATE("Iyar"))},
+	{9,	BString(B_TRANSLATE("Sivan"))},
+	{10,BString(B_TRANSLATE("Tammuz"))},
+	{11,BString(B_TRANSLATE("Av"))},
+	{12,BString(B_TRANSLATE("Elul"))},
+	{13,BString(B_TRANSLATE("Adar I"))},
+	{14,BString(B_TRANSLATE("Adar II"))}
+};
+
 GregorianDate GregorianDateFromTm(const struct tm& t)
 {
 	return {
@@ -93,6 +110,16 @@ int DaysBetween(const GregorianDate& in1, const GregorianDate &in2) {
 JewishCalendar::JewishCalendar(bool diaspora) :
 	_diaspora(diaspora)
 {
+}
+
+BString		JewishCalendar::HebrewDateToString (const HebrewDate& in) const
+{
+	// I suppose the Hebrew Date struct is already normalized
+	BString toReturn;
+	
+	
+	
+	return toReturn;
 }
 
 HebrewDate JewishCalendar::ToHebrewDate(const GregorianDate& in) const

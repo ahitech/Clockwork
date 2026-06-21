@@ -25,11 +25,20 @@ enum class Direction {
 	,NEXT = 1
 };
 
+
+class ClickableStringView : public BStringView {
+	public:
+		ClickableStringView (const char *a, const char *b) :
+			BStringView(a, b) { };
+		virtual ~ClickableStringView() {};
+		virtual void MouseDown(BPoint where);
+};
+
 class NextHolidayModule : public BBox {
 public:
     NextHolidayModule(BRect frame);
     NextHolidayModule(BMessage* in);
-    ~NextHolidayModule();
+    virtual ~NextHolidayModule();
     
     static BArchivable* Instantiate(BMessage* in);
     virtual status_t Archive(BMessage* out, bool deep = true) const;
@@ -38,7 +47,6 @@ public:
     
     // TODO:
     void UpdateCurrentHoliday(Direction);
-    void MouseDown(BPoint where) override {};
     
 
 private:
@@ -46,6 +54,7 @@ private:
 	void AddDragger();
 	int FindNextHolidayId(const GregorianDate& from, Direction) const;
 	const char* HolidayName(int holidayId) const;
+	void UpdateThirdLine();
 	
 	GregorianDate fToday;
 	GregorianDate	fNextHolidayDate;
@@ -58,8 +67,9 @@ private:
 	
 	BStringView* fFirstLine;
 	BStringView* fSecondLine;
-	BStringView* fThirdLine;
+	ClickableStringView* fThirdLine;
 	BStringView* fFourthLine;
 	BCheckBox*	 fUpdateOnMidnight;
+	bool fShownGregorianDate;
 };
 
