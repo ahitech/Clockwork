@@ -24,8 +24,6 @@
 #define B_TRANSLATION_CONTEXT "NextHolidayModule"
 
 void ClickableStringView::MouseDown(BPoint where) {
-	fprintf(stderr, "Clicked at %.2f, %.2f\n", where.x, where.y);
-	fflush(stderr);
 	if (Window() != nullptr && target != nullptr) {
 		BMessage* toSend = new BMessage(ToggleDateLanguage);
 		Window()->PostMessage(toSend, target);
@@ -207,7 +205,7 @@ void NextHolidayModule::UpdateCurrentHoliday(GregorianDate fFrom, Direction dir)
 	int holidayId = FindNextHolidayId(fFrom, dir);
 
 	if (holidayId == 0) {
-		fFirstLine->SetText(B_TRANSLATE("No holiday found"));
+//		fFirstLine->SetText(B_TRANSLATE("No holiday found"));
 		return;
 	}
 }
@@ -237,10 +235,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 						tempTM.tm_mday,
 						tempTM.tm_mon + 1,
 						tempTM.tm_year + 1900);
-		holiday = hdate_get_holyday (&tempHDate, 1);		// Diaspora
-		
-		printf("Holiday = %d\n", holiday);
-		
+		holiday = hdate_get_holyday (&tempHDate, 1);		// Diaspora		
 	} while (holiday == 0);
 	
 	HebrewDate Hdate(tempHDate.hd_year, tempHDate.hd_mon, tempHDate.hd_day);
@@ -368,10 +363,15 @@ void NextHolidayModule::MessageReceived(BMessage* in) {
 			UpdateThirdLine();
 			break;
 		case NextHolidayMessage:
+			fSelectedOffset++;
 			UpdateCurrentHoliday(fNextHolidayDate, Direction::NEXT);
 			fPrevHolidayButton->SetEnabled(true);
 			break;
 		case PrevHolidayMessage:
+			fSelectedOffset--;
+			if (fSelectedOffset == 0) {
+				fPrevHolidayButton->SetEnabled(false);
+			}
 			UpdateCurrentHoliday(fNextHolidayDate, Direction::PREVIOUS);
 			break;
 		default:
