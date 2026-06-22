@@ -101,7 +101,7 @@ void NextHolidayModule::AddDragger() {
 
 void NextHolidayModule::Init()
 {
-	fShownGregorianDate = false;		// We start with Gregorian date
+	fShownGregorianDate = true;		// We start with Gregorian date
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLabel(B_TRANSLATE("Next Hebrew Holiday"));
@@ -115,6 +115,9 @@ void NextHolidayModule::Init()
 
 	fPrevHolidayButton = new BButton("Prev Holiday", "<",
 		new BMessage(PrevHolidayMessage));
+	
+	// We start with the "previous" button disabled
+	fPrevHolidayButton->SetEnabled(false);
 
 	fNextHolidayButton = new BButton("Next Holiday", ">",
 		new BMessage(NextHolidayMessage));
@@ -166,7 +169,7 @@ void NextHolidayModule::Init()
 
 	AddChild(contentView);
 	
-	UpdateCurrentHoliday(fDirection);
+	UpdateCurrentHoliday(fToday, fDirection);
 }
 
 void NextHolidayModule::AttachedToWindow()
@@ -180,6 +183,7 @@ void NextHolidayModule::AttachedToWindow()
 	}
 	fNextHolidayButton->SetTarget(this);
 	fPrevHolidayButton->SetTarget(this);
+	UpdateThirdLine();
 }
 
 void NextHolidayModule::Pulse()
@@ -192,15 +196,15 @@ void NextHolidayModule::Pulse()
 		fToday = today;
 		fSelectedOffset = 0;
 		if (fUpdateOnMidnight->Value()) {
-			UpdateCurrentHoliday(Direction::NEXT);
+			UpdateCurrentHoliday(fToday, Direction::NEXT);
 		}
 		Invalidate();
 	}
 }
 
-void NextHolidayModule::UpdateCurrentHoliday(Direction dir)
+void NextHolidayModule::UpdateCurrentHoliday(GregorianDate fFrom, Direction dir)
 {
-	int holidayId = FindNextHolidayId(fNextHolidayDate, dir);
+	int holidayId = FindNextHolidayId(fFrom, dir);
 
 	if (holidayId == 0) {
 		fFirstLine->SetText(B_TRANSLATE("No holiday found"));
@@ -209,14 +213,11 @@ void NextHolidayModule::UpdateCurrentHoliday(Direction dir)
 }
 
 int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction direction) const
-{
-	fNextHolidayDate = from;
-	std::time_t now = std::time(nullptr);
-	struct tm tempTM;
-	localtime_r(&now, &tempTM);
+{	
+	struct tm tempTM = TMFromGregorianDate(from);
 	time_t	timeSinceEpoch;
 	int holiday = 0;
-	int counter = 0;
+	static int counter = 0;
 	char buffer[30];
 	hdate_struct tempHDate;
 	
@@ -229,7 +230,8 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 			dateChange = 1;
 		}
 		tempTM.tm_mday += dateChange;
-		counter++;
+		counter += dateChange;
+
 		timeSinceEpoch = mktime(&tempTM);
 		hdate_set_gdate(&tempHDate,
 						tempTM.tm_mday,
@@ -274,7 +276,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 
 	fFirstLine->SetText(holidayNames[holiday].second);
 	
-	ToggleThirdLine();
+	
 	
 	switch (counter) {
 		case 0: 
@@ -288,14 +290,14 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 			fFourthLine->SetText(buffer);
 			break;
 	};	
-
+	UpdateThirdLine();
 	return holiday;
 }		
 		
-void NextHolidayModule::ToggleThirdLine()
+void NextHolidayModule::UpdateThirdLine()
 {
 	char buffer[100];
-	if (!fShownGregorianDate)	// Hebrew date is shown
+	if (fShownGregorianDate)	// Gregorian date is shown
 	{
 		BString toDisplay;
 		switch (fNextHolidayDate.month) {
@@ -348,7 +350,7 @@ void NextHolidayModule::ToggleThirdLine()
 		fThirdLine->SetText(buffer);
 		fShownGregorianDate = true;
 	} else {
-		// Gregorian date is shown
+		// Hebrew date is shown
 		HebrewDate Hdate =
 			fJewishCalendar.ToHebrewDate(fNextHolidayDate);
 		sprintf(buffer, B_TRANSLATE("On %d of %s, %d"),
@@ -360,16 +362,17 @@ void NextHolidayModule::ToggleThirdLine()
 }
 
 void NextHolidayModule::MessageReceived(BMessage* in) {
-	fprintf(stdout, "Message received!\n");
-	fflush (stdout);
 	switch (in->what) {
 		case ToggleDateLanguage:
-			ToggleThirdLine();
+			fShownGregorianDate = (fShownGregorianDate) ? false : true;
+			UpdateThirdLine();
 			break;
 		case NextHolidayMessage:
-			fprintf(stdout, "Checking the next holiday...\n");
-			fflush(stdout);
-			FindNextHolidayId(fNextHolidayDate, Direction::NEXT);
+			UpdateCurrentHoliday(fNextHolidayDate, Direction::NEXT);
+			fPrevHolidayButton->SetEnabled(true);
+			break;
+		case PrevHolidayMessage:
+			UpdateCurrentHoliday(fNextHolidayDate, Direction::PREVIOUS);
 			break;
 		default:
 			BBox::MessageReceived(in);

@@ -54,14 +54,14 @@ public:
     virtual void MessageReceived (BMessage* in);
     
     // TODO:
-    void UpdateCurrentHoliday(Direction);
+    void UpdateCurrentHoliday(GregorianDate, Direction);
     
 
 private:
 	void Init();
 	void AddDragger();
 	int FindNextHolidayId(const GregorianDate& from, Direction) const;
-	void ToggleThirdLine();
+	void UpdateThirdLine();
 	
 	GregorianDate fToday;
 	GregorianDate	fNextHolidayDate;
