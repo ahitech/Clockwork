@@ -16,7 +16,7 @@ std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
 	{1, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Rosh HaShana first day"))}},
 	{2, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Rosh HaShana second day"))}},
 	{3, 	{TZOM, 				BString(B_TRANSLATE("Tzom Gedaliah"))}},
-	{4, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Yom_Kippur"))}},
+	{4, 	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Yom Kippur"))}},
 	{5,		{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Sukkot"))}},
 	{6, 	{HOL_HAMOED, 		BString(B_TRANSLATE("Hol HaMoed Sukkot"))}},
 	{7, 	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Hoshana Raba"))}},

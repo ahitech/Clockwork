@@ -20,13 +20,12 @@ public:
     	BLocaleRoster* be_locale_roster = BLocaleRoster::Default();
 //    	be_locale_roster->SetPreferredLanguages("ru");
     	
-        BRect frame(100, 100, 470, 400);
+        BRect frame(100, 100, 470, 500);
         BWindow* window = new BWindow(frame, "Clockwork — Today", B_TITLED_WINDOW,
         	B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
 
         BRect viewFrame = (window->Bounds());
-        fprintf(stderr, "Window bounds: %.1f x %.1f", viewFrame.Width(), viewFrame.Height());
-
+        
 		BView* mainView = new BView(viewFrame, "main view",
 			B_FOLLOW_ALL_SIDES,
 			B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
@@ -37,13 +36,14 @@ public:
 		layout->SetInsets(10, 10, 20, 10);
 		mainView->SetLayout(layout);
 
-//        TodayModuleView* view = new TodayModuleView(BRect(0, 0, 300, 100));
-//        view->MoveTo(0, 0);
-//        view->ResizeTo(viewFrame.Width(), 20);
-
-		NextHolidayModule* view = new NextHolidayModule(BRect(0, 0, 300, 100));
+        TodayModuleView* todayView = new TodayModuleView(BRect(0, 0, 300, 100));
+        BLayoutItem* layoutItem = layout->AddView(todayView);
+        layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_TOP));
         
-        BLayoutItem* layoutItem = layout->AddView(view);
+
+		NextHolidayModule* view = new NextHolidayModule(BRect(0, 100, 300, 300));
+        
+        layoutItem = layout->AddView(view);
         layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_TOP));
         
         MoonModule* moonModule = new MoonModule(viewFrame);

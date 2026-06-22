@@ -52,7 +52,7 @@ void ClickableStringView::MouseMoved(BPoint where, uint32 transit,
 
 NextHolidayModule::NextHolidayModule(BRect frame) :
 	BBox(frame,
-		 "Next Holiday",
+		 B_TRANSLATE("Next Holiday"),
 		 B_FOLLOW_H_CENTER | B_FOLLOW_V_CENTER,
 		 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_PULSE_NEEDED )
 {

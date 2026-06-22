@@ -1,18 +1,100 @@
-1	English	application/x-vnd.clockwork-app	291967329
+1	English	application/x-vnd.clockwork-app	1642892864
 String	TodayModuleView		String
-Remove replicant	TodayModuleView		Remove replicant
-Shevat	HebrewDate		Shevat
+Judaic major	NextHolidayModule		Judaic major
 Adar I	HebrewDate		Adar I
-Sivan	HebrewDate		Sivan
-Nisan	HebrewDate		Nisan
-Av	HebrewDate		Av
+Purim	JewishCalendar		Purim
+Tomorrow	NextHolidayModule		Tomorrow
+Shavuot second day	JewishCalendar		Shavuot second day
+Sivan	JewishCalendar		Sivan
+Nisan	JewishCalendar		Nisan
+December	NextHolidayModule		December
+Adar II	JewishCalendar		Adar II
+Simchat Torah	JewishCalendar		Simchat Torah
+Yom HaShoah	JewishCalendar		Yom HaShoah
+Kislev	JewishCalendar		Kislev
+Judaic minor	NextHolidayModule		Judaic minor
+Pesach	JewishCalendar		Pesach
+March	NextHolidayModule		March
+On %d of %s, %d	NextHolidayModule		On %d of %s, %d
+July	NextHolidayModule		July
+Pesach second day	JewishCalendar		Pesach second day
+No month	JewishCalendar		No month
+Tzom Tammuz	JewishCalendar		Tzom Tammuz
+January	NextHolidayModule		January
+Kislev	HebrewDate		Kislev
+No holiday	JewishCalendar		No holiday
+Zeev Zhabotinsky day	JewishCalendar		Zeev Zhabotinsky day
+Erev Sukkot	JewishCalendar		Erev Sukkot
+Recalculate at midnight	NextHolidayModule		Recalculate at midnight
+May	NextHolidayModule		May
+Remove replicant	TodayModuleView		Remove replicant
+Rememberance day	NextHolidayModule		Rememberance day
+August	NextHolidayModule		August
+Current moon phase	Moon Module		Current moon phase
+Family Day	JewishCalendar		Family Day
+November	NextHolidayModule		November
 Tevet	HebrewDate		Tevet
 Adar	HebrewDate		Adar
-Elul	HebrewDate		Elul
+Shmini Atzeret	JewishCalendar		Shmini Atzeret
+Hoshana Raba	JewishCalendar		Hoshana Raba
+Taanit Ester	JewishCalendar		Taanit Ester
+June	NextHolidayModule		June
+Shavuot	JewishCalendar		Shavuot
+Hanukkah	JewishCalendar		Hanukkah
 Tishrei	HebrewDate		Tishrei
-	HebrewDate		
-Adar II	HebrewDate		Adar II
-Kislev	HebrewDate		Kislev
-Cheshvan	HebrewDate		Cheshvan
-Tammuz	HebrewDate		Tammuz
+Sukkot second day	JewishCalendar		Sukkot second day
+Cheshvan	JewishCalendar		Cheshvan
+September	NextHolidayModule		September
+Tammuz	JewishCalendar		Tammuz
+Erev Pesach	JewishCalendar		Erev Pesach
+No month	HebrewDate		No month
+February	NextHolidayModule		February
+In %d days	NextHolidayModule		In %d days
+October	NextHolidayModule		October
+Adar	JewishCalendar		Adar
+Tevet	JewishCalendar		Tevet
+Elul	JewishCalendar		Elul
+Tu BiShvat	JewishCalendar		Tu BiShvat
+Religious Fast	NextHolidayModule		Religious Fast
 Iyar	HebrewDate		Iyar
+Yom HaAtzmaut	JewishCalendar		Yom HaAtzmaut
+Shevat	HebrewDate		Shevat
+Tishrei	JewishCalendar		Tishrei
+Sivan	HebrewDate		Sivan
+Nisan	HebrewDate		Nisan
+Iyar	JewishCalendar		Iyar
+Av	HebrewDate		Av
+Yom_Kippur	JewishCalendar		Yom_Kippur
+Adar I	JewishCalendar		Adar I
+Elul	HebrewDate		Elul
+Shushan_Purim	JewishCalendar		Shushan_Purim
+Yitzhak Rabin memorial day	JewishCalendar		Yitzhak Rabin memorial day
+Chol HaMoed	NextHolidayModule		Chol HaMoed
+Shevi'i shel Pesach	JewishCalendar		Shevi'i shel Pesach
+Erev Shavuot	JewishCalendar		Erev Shavuot
+Adar II	HebrewDate		Adar II
+Hol HaMoed Sukkot	JewishCalendar		Hol HaMoed Sukkot
+Cheshvan	HebrewDate		Cheshvan
+Asara BeTevet	JewishCalendar		Asara BeTevet
+Tu BeAv	JewishCalendar		Tu BeAv
+Next Hebrew Holiday	NextHolidayModule		Next Hebrew Holiday
+Yom Yerushalayim	JewishCalendar		Yom Yerushalayim
+Hol HaMoed Pesach	JewishCalendar		Hol HaMoed Pesach
+Rosh HaShana second day	JewishCalendar		Rosh HaShana second day
+April	NextHolidayModule		April
+Av	JewishCalendar		Av
+Tonight	NextHolidayModule		Tonight
+Civil holiday	NextHolidayModule		Civil holiday
+Acharon shel Pesach	JewishCalendar		Acharon shel Pesach
+Tzom Gedaliah	JewishCalendar		Tzom Gedaliah
+Tish'a BeAv	JewishCalendar		Tish'a BeAv
+Lag BaOmer	JewishCalendar		Lag BaOmer
+Yom HaZikaron	JewishCalendar		Yom HaZikaron
+Memorial day for fallen whose place of burial is unknown	JewishCalendar		Memorial day for fallen whose place of burial is unknown
+No month	NextHolidayModule		No month
+Shvat	JewishCalendar		Shvat
+Erev Yom Kippur	JewishCalendar		Erev Yom Kippur
+Not a holiday	NextHolidayModule		Not a holiday
+Sukkot	JewishCalendar		Sukkot
+Tammuz	HebrewDate		Tammuz
+Rosh HaShana first day	JewishCalendar		Rosh HaShana first day
