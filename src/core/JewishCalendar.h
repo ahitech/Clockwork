@@ -75,7 +75,7 @@ struct JewishMonth {
 	BString name;
 };
 
-extern JewishMonth JewishMonths[14];
+extern JewishMonth JewishMonths[15];
 
 
 class JewishCalendar {

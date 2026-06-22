@@ -61,8 +61,7 @@ private:
 	void Init();
 	void AddDragger();
 	int FindNextHolidayId(const GregorianDate& from, Direction) const;
-	const char* HolidayName(int holidayId) const;
-	void UpdateThirdLine();
+	void ToggleThirdLine();
 	
 	GregorianDate fToday;
 	GregorianDate	fNextHolidayDate;
@@ -79,5 +78,6 @@ private:
 	BStringView* fFourthLine;
 	BCheckBox*	 fUpdateOnMidnight;
 	bool fShownGregorianDate;
+	Direction fDirection;
 };
 

@@ -55,7 +55,8 @@ std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
 };
 
 
-JewishMonth	JewishMonths[14] = {
+JewishMonth	JewishMonths[15] = {
+	{0, BString(B_TRANSLATE("No month"))},
 	{1, BString(B_TRANSLATE("Tishrei"))},
 	{2, BString(B_TRANSLATE("Cheshvan"))},
 	{3, BString(B_TRANSLATE("Kislev"))},
@@ -127,14 +128,25 @@ HebrewDate JewishCalendar::ToHebrewDate(const GregorianDate& in) const
 	hdate_struct hs;
 	hdate_set_gdate (&hs, in.day, in.month, in.year);
 	HebrewDate toReturn(hs.hd_year, hs.hd_mon, hs.hd_day);
+	fprintf(stderr, "Translating to hebrew date: year = %d, month = %d, day = %d\n",
+		hs.hd_year, hs.hd_mon, hs.hd_day);
+	fflush(stderr);
 	return toReturn;
 }
 	
 GregorianDate	JewishCalendar::ToGregorianDate(const HebrewDate& in) const
 {
 	hdate_struct hs;
+	fprintf(stderr, "Hebrew day = %d, Hebrew month = %d, Hebrew year = %d\n",
+		in.Day(), in.Month(), in.Year());
 	hdate_set_hdate(&hs, in.Day(), in.Month(), in.Year());
-	GregorianDate toReturn(hs.gd_year, hs.gd_mon, hs.gd_day);
+	GregorianDate toReturn;
+	toReturn.year = hdate_get_gyear (&hs);
+	toReturn.month = hdate_get_gmonth(&hs);
+	toReturn.day = hdate_get_gday(&hs);
+	fprintf(stderr, "Gregorian day = %d, Gregorian month = %d, Gregorian year = %d\n",
+		toReturn.day, toReturn.month, toReturn.year);
+	fflush(stderr);
 	return toReturn;
 }
 

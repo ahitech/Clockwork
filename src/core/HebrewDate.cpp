@@ -18,7 +18,7 @@
 
 
 std::unordered_map<std::string, std::string> months =
-	{	{"", 			B_TRANSLATE("") },
+	{	{"",			B_TRANSLATE("No month") },
 		{"Sivan", 		B_TRANSLATE("Sivan") },
 		{"Tishrei", 	B_TRANSLATE("Tishrei") },
 		{"Cheshvan",	B_TRANSLATE("Cheshvan") },

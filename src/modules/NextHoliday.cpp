@@ -105,6 +105,7 @@ void NextHolidayModule::Init()
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	SetLabel(B_TRANSLATE("Next Hebrew Holiday"));
+	fDirection = Direction::NEXT;
 
 	SetFlags(Flags() | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE
 		| B_PULSE_NEEDED);
@@ -114,11 +115,10 @@ void NextHolidayModule::Init()
 
 	fPrevHolidayButton = new BButton("Prev Holiday", "<",
 		new BMessage(PrevHolidayMessage));
-	fPrevHolidayButton->SetTarget(this);
 
 	fNextHolidayButton = new BButton("Next Holiday", ">",
 		new BMessage(NextHolidayMessage));
-	fNextHolidayButton->SetTarget(this);
+	
 
 	fFirstLine = new BStringView("First Line", "First Line");
 	fFirstLine->SetAlignment(B_ALIGN_CENTER);
@@ -166,7 +166,7 @@ void NextHolidayModule::Init()
 
 	AddChild(contentView);
 	
-	UpdateCurrentHoliday(Direction::NEXT);
+	UpdateCurrentHoliday(fDirection);
 }
 
 void NextHolidayModule::AttachedToWindow()
@@ -178,6 +178,8 @@ void NextHolidayModule::AttachedToWindow()
 	if (Window() != NULL) {
 		Window()->SetPulseRate(60 * 1000000LL);	// Once a minute
 	}
+	fNextHolidayButton->SetTarget(this);
+	fPrevHolidayButton->SetTarget(this);
 }
 
 void NextHolidayModule::Pulse()
@@ -239,7 +241,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 		
 	} while (holiday == 0);
 	
-	HebrewDate Hdate(tempHDate.hd_day, tempHDate.hd_mon, tempHDate.hd_year);
+	HebrewDate Hdate(tempHDate.hd_year, tempHDate.hd_mon, tempHDate.hd_day);
 	
 	
 	fNextHolidayDate = fJewishCalendar.ToGregorianDate(Hdate);
@@ -272,9 +274,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 
 	fFirstLine->SetText(holidayNames[holiday].second);
 	
-	sprintf(buffer, "On %d.%d.%d", tempTM.tm_mday, tempTM.tm_mon+1,
-		tempTM.tm_year+1900);
-	fThirdLine->SetText(buffer);
+	ToggleThirdLine();
 	
 	switch (counter) {
 		case 0: 
@@ -292,7 +292,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 	return holiday;
 }		
 		
-void NextHolidayModule::UpdateThirdLine()
+void NextHolidayModule::ToggleThirdLine()
 {
 	char buffer[100];
 	if (!fShownGregorianDate)	// Hebrew date is shown
@@ -341,8 +341,8 @@ void NextHolidayModule::UpdateThirdLine()
 		};
 		
 		
-		sprintf(buffer, B_TRANSLATE("On %s %dth %d"),
-			toDisplay.String(), fNextHolidayDate.day,
+		sprintf(buffer, B_TRANSLATE("On %d of %s, %d"),
+			fNextHolidayDate.day, toDisplay.String(),
 			fNextHolidayDate.year),
 			
 		fThirdLine->SetText(buffer);
@@ -359,70 +359,18 @@ void NextHolidayModule::UpdateThirdLine()
 	}
 }
 
-const char* NextHolidayModule::HolidayName(int holidayId) const
-{
-	for (int i = 0; i < 400; i++) {
-		
-		printf(hdate_string (HDATE_STRING_HOLIDAY, 
-									i,
-									0,
-									HDATE_STRING_LOCAL));
-		printf(" - ");
-		printf(hdate_string (HDATE_STRING_PARASHA, 
-									i,
-									1,
-									HDATE_STRING_LOCAL));
-		printf("\n");
-		fflush(stdout);
-	}
-	
-	return B_TRANSLATE(hdate_string (HDATE_STRING_HOLIDAY, 
-									holidayId,
-									0,
-									HDATE_STRING_LOCAL));
-		
-//	switch (holidayId) {
-//		case 1:
-//			return B_TRANSLATE("Yom Tov");
-//
-//		case 2:
-//			return B_TRANSLATE("Yom Kippur Eve");
-//
-//		case 3:
-//			return B_TRANSLATE("Hol ha-Moed");
-//
-//		case 4:
-//			return B_TRANSLATE("Hanukkah / Purim");
-//
-//		case 5:
-//			return B_TRANSLATE("Tzom");
-//
-//		case 6:
-//			return B_TRANSLATE("Independence day");
-//
-//		case 7:
-//			return B_TRANSLATE("Tu be-av");
-//
-//		case 8:
-//			return B_TRANSLATE("Holocost memorial day");
-//
-//		case 9:
-//			return B_TRANSLATE("National day");
-//
-//		default:
-//			{
-//				char buffer[20];
-//				sprintf(buffer, "%d Unknown holiday", holidayId);
-//				return B_TRANSLATE(buffer);
-//			}
-//	}
-}
-
 void NextHolidayModule::MessageReceived(BMessage* in) {
+	fprintf(stdout, "Message received!\n");
+	fflush (stdout);
 	switch (in->what) {
 		case ToggleDateLanguage:
-			fprintf(stdout, "Message Received!\n");
+			ToggleThirdLine();
+			break;
+		case NextHolidayMessage:
+			fprintf(stdout, "Checking the next holiday...\n");
 			fflush(stdout);
+			FindNextHolidayId(fNextHolidayDate, Direction::NEXT);
+			break;
 		default:
 			BBox::MessageReceived(in);
 	}
