@@ -25,7 +25,8 @@ TodayModuleView::TodayModuleView(BRect frame) :
 	BBox(frame,
 		 B_TRANSLATE("Today"),
 		 B_FOLLOW_H_CENTER | B_FOLLOW_V_CENTER,
-		 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_PULSE_NEEDED )
+		 B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS | B_PULSE_NEEDED ),
+	contentView(nullptr)
 {
 	Init();
 	AddDragger();
@@ -36,6 +37,11 @@ TodayModuleView::TodayModuleView(BMessage* in) :
 {
 	SetFlags(Flags() | B_PULSE_NEEDED);
 	Init();
+	contentView->SetViewColor(B_TRANSPARENT_COLOR);
+	contentView->SetLowColor(B_TRANSPARENT_COLOR);
+	contentView->SetHighColor(B_TRANSPARENT_COLOR);
+	fTodayStringView->SetViewColor(B_TRANSPARENT_COLOR);
+	fTodayStringView->SetLowColor(B_TRANSPARENT_COLOR);
 }
 
 void TodayModuleView::AddDragger() {
@@ -56,12 +62,12 @@ void TodayModuleView::Init() {
 	content.InsetBy(6, 6);
 	content.top += 10; // Leave room for the BBox label.
 
-	BView* contentView = new BView(content, "today content",
+	contentView = new BView(content, "today content",
 		B_FOLLOW_ALL, B_WILL_DRAW);
 	
 	
 	contentView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-//   contentView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+    contentView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     this->AddChild(contentView);
 
 	BGroupLayout* mainLayout = new BGroupLayout(B_HORIZONTAL, 8);
@@ -69,7 +75,8 @@ void TodayModuleView::Init() {
 	contentView->SetLayout(mainLayout);
 	
 	fTodayStringView = new BStringView("Today", "Today");
-	fTodayStringView->SetLowColor(rgb_color(244, 0, 0));
+	fTodayStringView->SetViewColor(B_TRANSPARENT_COLOR);
+	fTodayStringView->SetLowColor(B_TRANSPARENT_COLOR);
 	BLayoutItem* layoutItem = mainLayout->AddView(fTodayStringView);
 	layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_TOP));
 	

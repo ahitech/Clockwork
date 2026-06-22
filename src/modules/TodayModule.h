@@ -31,6 +31,7 @@ private:
     GregorianDate fToday;
     BString fDateString;
     BStringView* fTodayStringView;
+    BView* contentView;
     
     void UpdateContent();
     void Init();
