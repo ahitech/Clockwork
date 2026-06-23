@@ -10,6 +10,7 @@ SRCS = \
     src/modules/TodayModule.cpp \
     src/modules/MoonModule.cpp	\
     src/modules/NextHoliday.cpp \
+    src/modules/ConverterModule.cpp	\
     src/main.cpp
 
 LIBS = 	hdate \

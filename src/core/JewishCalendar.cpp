@@ -117,8 +117,10 @@ BString		JewishCalendar::HebrewDateToString (const HebrewDate& in) const
 {
 	// I suppose the Hebrew Date struct is already normalized
 	BString toReturn;
-	
-	
+	char buffer[50];
+	sprintf(buffer, "%d of %s, %d",
+		in.Day(), JewishMonths[in.Month()].name, in.Year());
+	toReturn.SetTo(buffer);
 	
 	return toReturn;
 }

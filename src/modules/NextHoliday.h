@@ -15,7 +15,6 @@
 #include <Dragger.h>
 #include <Window.h>
 #include "../core/HebrewDate.h"
-#include "../core/ResizableBox.h"
 #include "../core/JewishCalendar.h"
 
 const uint32	PrevHolidayMessage	= 'pHDM';

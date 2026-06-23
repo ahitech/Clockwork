@@ -49,6 +49,20 @@ HebrewDate::HebrewDate(std::time_t gTime, bool diaspora)
     hDay_ = h.hd_day;
 }
 
+HebrewDate::HebrewDate() {
+	std::time_t now = std::time(nullptr);
+	struct tm localtime;
+	localtime_r(&now, &localtime);
+    hdate_struct h;
+    hdate_set_gdate(&h, localtime.tm_mday, 
+    				localtime.tm_mon + 1, 
+    				localtime.tm_year + 1900);
+    hYear_ = h.hd_year;
+    hMonth_ = h.hd_mon;
+    hDay_ = h.hd_day;
+   	diaspora_ = false;
+}	
+
 int HebrewDate::Day() const { return hDay_; }
 int HebrewDate::Month() const { return hMonth_; }
 int HebrewDate::Year() const { return hYear_; }

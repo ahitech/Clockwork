@@ -9,6 +9,7 @@
 #include "modules/TodayModule.h"
 #include "modules/MoonModule.h"
 #include "modules/NextHoliday.h"
+#include "modules/ConverterModule.h"
 
 class ClockworkApp : public BApplication {
 public:
@@ -20,7 +21,7 @@ public:
     	BLocaleRoster* be_locale_roster = BLocaleRoster::Default();
 //    	be_locale_roster->SetPreferredLanguages("ru");
     	
-        BRect frame(100, 100, 470, 500);
+        BRect frame(100, 100, 470, 700);
         BWindow* window = new BWindow(frame, "Clockwork — Today", B_TITLED_WINDOW,
         	B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
 
@@ -52,6 +53,11 @@ public:
 		
 		layoutItem = layout->AddView(moonModule);
 		layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_BOTTOM));
+		
+		ConverterModuleView* converterModule = new ConverterModuleView(viewFrame);
+		layoutItem = layout->AddView(converterModule);
+		layoutItem->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_BOTTOM));
+		
         
         window->Show();
     }

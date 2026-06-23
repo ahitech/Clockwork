@@ -15,6 +15,10 @@
 #include <Catalog.h>
 #include <SupportDefs.h>
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "JewishCalendarHeader"
+
+extern BString GregorianMonthNames[13];
 
 /**
  *	\brief		Struct that represents Gregorian date
@@ -48,6 +52,15 @@ struct GregorianDate {
 		month = result.tm_mon + 1;
 		day   = result.tm_mday;
 	}
+	
+	BString ToString() {
+		char buffer[50];
+		sprintf(buffer, B_TRANSLATE("%d of %s, %d"),
+			day, GregorianMonthNames[month], year);
+		BString toReturn(buffer);
+		return toReturn;
+	}
+		
 };
 
 	GregorianDate GregorianDateFromTm(const struct tm&);

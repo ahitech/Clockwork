@@ -11,6 +11,7 @@ class HebrewDate {
 public:
     HebrewDate(int hYear, int hMonth, int hDay);
     HebrewDate(std::time_t gTime, bool diaspora = true);
+    HebrewDate();
 
     int Day() const;
     int Month() const;
