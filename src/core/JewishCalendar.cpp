@@ -26,7 +26,7 @@ std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
 	{11,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Tu BiShvat"))}},
 	{12,	{TZOM, 				BString(B_TRANSLATE("Taanit Ester"))}},
 	{13,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Purim"))}},
-	{14,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Shushan_Purim"))}},
+	{14,	{RELIGIOUS_MINOR, 	BString(B_TRANSLATE("Shushan Purim"))}},
 	{15,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Pesach"))}},
 	{16,	{HOL_HAMOED,		BString(B_TRANSLATE("Hol HaMoed Pesach"))}},
 	{17,	{CIVIL,				BString(B_TRANSLATE("Yom HaAtzmaut"))}},
@@ -36,8 +36,8 @@ std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
 	{21,	{TZOM,				BString(B_TRANSLATE("Tzom Tammuz"))}},
 	{22,	{TZOM,				BString(B_TRANSLATE("Tish'a BeAv"))}},
 	{23,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Tu BeAv"))}},
-	{24,	{CIVIL,				BString(B_TRANSLATE("Yom HaShoah"))}},
-	{25,	{CIVIL,				BString(B_TRANSLATE("Yom HaZikaron"))}},
+	{24,	{MINOR,				BString(B_TRANSLATE("Yom HaShoah"))}},
+	{25,	{MINOR,				BString(B_TRANSLATE("Yom HaZikaron"))}},
 	{26,	{CIVIL,				BString(B_TRANSLATE("Yom Yerushalayim"))}},
 	{27,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Shmini Atzeret"))}},
 	{28,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Shevi'i shel Pesach"))}},
@@ -46,7 +46,7 @@ std::map<int, std::pair<enum HolidayType, BString>> holidayNames = {
 	{31,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Sukkot second day"))}},
 	{32,	{RELIGIOUS_MINOR,	BString(B_TRANSLATE("Pesach second day"))}},
 	{33,	{CIVIL,				BString(B_TRANSLATE("Family Day"))}},
-	{34,	{CIVIL,				BString(B_TRANSLATE("Memorial day for fallen whose place of burial is unknown"))}},
+	{34,	{MINOR,				BString(B_TRANSLATE("Memorial day for fallen whose place of burial is unknown"))}},
 	{35,	{MINOR,				BString(B_TRANSLATE("Yitzhak Rabin memorial day"))}},
 	{36,	{MINOR,				BString(B_TRANSLATE("Zeev Zhabotinsky day"))}}, 
 	{37,	{RELIGIOUS_MAJOR, 	BString(B_TRANSLATE("Erev Yom Kippur"))}},
@@ -72,6 +72,22 @@ JewishMonth	JewishMonths[15] = {
 	{13,BString(B_TRANSLATE("Adar I"))},
 	{14,BString(B_TRANSLATE("Adar II"))}
 };
+
+BString GregorianMonthNames[13] = 
+	{	BString(B_TRANSLATE("No month"))
+		,BString(B_TRANSLATE("January"))
+		,BString(B_TRANSLATE("February"))
+		,BString(B_TRANSLATE("March"))
+		,BString(B_TRANSLATE("April"))
+		,BString(B_TRANSLATE("May"))
+		,BString(B_TRANSLATE("June"))
+		,BString(B_TRANSLATE("July"))
+		,BString(B_TRANSLATE("August"))
+		,BString(B_TRANSLATE("September"))
+		,BString(B_TRANSLATE("October"))
+		,BString(B_TRANSLATE("November"))
+		,BString(B_TRANSLATE("December"))
+	};
 
 GregorianDate GregorianDateFromTm(const struct tm& t)
 {
@@ -119,7 +135,7 @@ BString		JewishCalendar::HebrewDateToString (const HebrewDate& in) const
 	BString toReturn;
 	char buffer[50];
 	sprintf(buffer, "%d of %s, %d",
-		in.Day(), JewishMonths[in.Month()].name, in.Year());
+		in.Day(), JewishMonths[in.Month()].name.String(), in.Year());
 	toReturn.SetTo(buffer);
 	
 	return toReturn;

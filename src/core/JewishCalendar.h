@@ -56,7 +56,7 @@ struct GregorianDate {
 	BString ToString() {
 		char buffer[50];
 		sprintf(buffer, B_TRANSLATE("%d of %s, %d"),
-			day, GregorianMonthNames[month], year);
+			day, GregorianMonthNames[month].String(), year);
 		BString toReturn(buffer);
 		return toReturn;
 	}

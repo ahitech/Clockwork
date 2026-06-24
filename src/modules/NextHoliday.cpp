@@ -245,7 +245,7 @@ int NextHolidayModule::FindNextHolidayId(const GregorianDate& from, Direction di
 		
 	switch (holidayNames[holiday].first) {
 		case RELIGIOUS_MAJOR:
-			sprintf(buffer, B_TRANSLATE("Judaic major"));
+			sprintf(buffer, B_TRANSLATE("Judaic Major"));
 			break;
 		case RELIGIOUS_MINOR:
 			sprintf(buffer, B_TRANSLATE("Judaic minor"));
