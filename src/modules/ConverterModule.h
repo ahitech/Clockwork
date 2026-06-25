@@ -32,6 +32,7 @@
 
 const uint32	CONVERT_TO_GREGORIAN= 'cTGr';
 const uint32	CONVERT_TO_HEBREW	= 'cTHb';
+const uint32	TEXT_CHANGED		= 'cHgd';
 
 class NumbersTextControl : public BTextControl {
 public:
@@ -40,15 +41,18 @@ public:
 						const char* label,
 						const char* data,
 						BMessage* message = nullptr);
-	NumbersTextControl (BMessage *in) : BTextControl(in) {};
+	NumbersTextControl (BMessage *in);
 	virtual ~NumbersTextControl() {};
-	virtual status_t Archive(BMessage* out, bool deep = true) { return BTextControl::Archive(out, deep);};
+	virtual status_t Archive(BMessage* out, bool deep = true);
 	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage* in) {};
+	virtual void MessageReceived(BMessage* in);
 	
 	virtual void KeyDown(const char* bytes, int32 numBytes);
 private:
 	uint fAllowedDigits;
+	bool fSanitizing;
+	
+	void SanitizeText();
 };
 
 

@@ -17,11 +17,44 @@ NumbersTextControl::NumbersTextControl( uint allowedDigits,
 						const char* data,
 						BMessage* message = nullptr) :
 		BTextControl(name, label, data, message),
-		fAllowedDigits(allowedDigits)
+		fAllowedDigits(allowedDigits),
+		fSanitizing(false)
 {
 
 };
 
+NumbersTextControl::NumbersTextControl(BMessage* in)
+	:	BTextControl(in),
+		fSanitizing(false)
+{
+	if (in->FindInt32("Allowed Digits", (int32*)(&fAllowedDigits)) != B_OK)
+		fAllowedDigits = 4;
+}
+
+
+status_t NumbersTextControl::Archive(BMessage* out, bool deep = true)
+{
+	status_t toReturn = BTextControl::Archive(out, deep);
+	if (toReturn != B_OK) {
+		return toReturn;
+	}
+	toReturn = out->AddInt32("Allowed Digits", static_cast<int32>(fAllowedDigits));
+	
+	return toReturn;
+}
+
+void NumbersTextControl::MessageReceived(BMessage* in) {
+	switch (in->what)
+	{
+		case (TEXT_CHANGED):
+			SanitizeText();
+			break;
+		
+		default:
+			BTextControl::MessageReceived(in);
+			break;
+	}
+}
 
 void NumbersTextControl::KeyDown(const char* bytes, int32 numBytes)
 {
@@ -60,8 +93,36 @@ void NumbersTextControl::AttachedToWindow()
 	if ( Parent() )
       SetViewColor(Parent()->ViewColor());
     BTextControl::AttachedToWindow();
+    SetModificationMessage(new BMessage(TEXT_CHANGED));
+	SetTarget(this);
 }
 
+void NumbersTextControl::SanitizeText()
+{
+	if (fSanitizing)
+		return;		// Only one sanitization at a time
+
+	fSanitizing = true;
+
+	BString source(Text());
+	BString clean;
+
+	for (int32 i = 0; i < source.CountChars(); i++) {
+		BString ch;
+		source.CopyCharsInto(ch, i, 1);
+
+		if (ch.Length() == 1 && ch[0] >= '0' && ch[0] <= '9')
+			clean << ch;
+	}
+
+	while ((uint)clean.CountChars() > fAllowedDigits)
+		clean.Remove(0, 1);
+
+	if (clean != Text())
+		SetText(clean.String());
+
+	fSanitizing = false;
+}
 
 //	-----==< ConverterModuleView >==-----
 
