@@ -10,6 +10,7 @@
 #include <CheckBox.h>
 #include <Deskbar.h>
 #include <Menu.h>
+#include <PopUpMenu.h>
 #include <MenuField.h>
 #include <Message.h>
 #include <Messenger.h>
@@ -75,23 +76,29 @@ private:
 	GregorianDate	fGregorianDate;
 	HebrewDate		fHebrewDate;
 	
-	BTextControl* 	fHYear;
-	BTextControl* 	fGYear;
+	NumbersTextControl*	fHYear;
+	NumbersTextControl* fGYear;
 	BMenuField*		fHMonth;
-	BMenu*			fHMonths;
+	BPopUpMenu*			fHMonths;
 	BMenuField*		fGMonth;
-	BMenu*			fGMonths;
-	BMenuField*		fHDay;
+	BPopUpMenu*			fGMonths;
 	BMenuField*		fGDay;
-	
+	BPopUpMenu*		fGDays;
+	BMenuField*		fHDay;
+	BPopUpMenu*		fHDays;
 	
 	BString fGregorianDateString;
 	BString fHebrewDateString;
 	JewishCalendar fJewishCalendar;
 	
 	void Init();
+	void InitializeDateFields();
 	void AddDragger();
 	void InitializeDatesToToday();
+	void BuildMonthsMenus(uint hebrewYear);
+	void BuildHebrewDaysMenus(uint hebrewYear, uint hebrewMonth);
+	void BuildGregorianDaysMenus(uint gregorianYear, uint gregorianMonth);
+	void ClearMenu(BMenu* );
 };
 
 

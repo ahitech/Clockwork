@@ -250,3 +250,46 @@ int JewishCalendar::DaysInHebrewMonth(uint year, uint month) const
 
 	return days;
 }
+
+int JewishCalendar::MonthsInHebrewYear(uint year) const
+{
+	if (year == 0) return 0;
+	return (DaysInHebrewMonth(year, 14) > 0) ? 13 : 12;
+}
+
+bool JewishCalendar::IsValidHebrewMonth(uint year, uint month) const
+{
+	if (year == 0 || month == 0 || month > 14)
+		return false;
+
+	return DaysInHebrewMonth(year, month) > 0;
+}
+
+int JewishCalendar::DaysInGregorianMonth(uint year, uint month) const {
+	switch (month) {
+		case 1:		// January
+		case 3:		// March
+		case 5:		// May
+		case 7:		// July
+		case 8:		// August
+		case 10:	// October
+		case 12:	// December
+			return 31;
+			break;
+		case 4:		// April
+		case 6:		// June
+		case 9:		// September
+		case 11:	// November
+			return 30;
+			break;
+		case 2:		// February
+			if ((year % 4 == 0) && 
+				((year % 100 != 0) || (year %400 == 0)))
+			{
+				return 29; break;
+			} else {
+				return 28; break;
+			}
+	};
+	return 0;
+}

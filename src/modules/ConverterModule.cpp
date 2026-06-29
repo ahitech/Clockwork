@@ -5,6 +5,7 @@
 
 #include "ConverterModule.h"
 #include <GridLayout.h>
+#include <MenuItem.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ConverterModule"
@@ -150,9 +151,6 @@ void ConverterModuleView::Init()
 	fHebrewStringView = new BStringView("Hebrew",
 		B_TRANSLATE("Hebrew:"));
 
-	fHYear = new BTextControl("Hebrew year", B_TRANSLATE("Year"), "", nullptr);
-	fGYear = new BTextControl("Gregorian year", B_TRANSLATE("Year"), "", nullptr);
-
 	fToGregorian = new BButton("Convert to Gregorian", "↑",
 		new BMessage(CONVERT_TO_GREGORIAN));
 	fToHebrew = new BButton("Convert to Hebrew", "↓",
@@ -169,10 +167,24 @@ void ConverterModuleView::Init()
 	mainLayout->SetInsets(8, 10, 10, 10);
 	fContentView->SetLayout(mainLayout);
 	
+	fGDays = new BPopUpMenu("Gregorian days");
+	fHDays = new BPopUpMenu("Hebrew days");
+	fGMonths = new BPopUpMenu("Gregorian months");
+	fHMonths = new BPopUpMenu("Hebrew months");
+	
+	InitializeDatesToToday();
+	InitializeDateFields();
+	
 	mainLayout->AddView(fToGregorian, 0, 0, 1, 2);
 	mainLayout->AddView(fGregorianStringView, 1, 0);
+	mainLayout->AddView(fGYear, 2, 0);
+	mainLayout->AddView(fHYear, 2, 1);
+	mainLayout->AddView(fGMonth, 3, 0);
+	mainLayout->AddView(fHMonth, 3, 1);
+	mainLayout->AddView(fGDay, 4, 0);
+	mainLayout->AddView(fHDay, 4, 1);
 	mainLayout->AddView(fHebrewStringView, 1, 1);
-	mainLayout->AddView(fToHebrew, 2, 0, 1, 2);
+	mainLayout->AddView(fToHebrew, 5, 0, 1, 2);
 	
 	fContentView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
     fContentView->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -180,7 +192,6 @@ void ConverterModuleView::Init()
 	fContentView->InvalidateLayout();
 	
 	this->AddChild(fContentView);
-	InitializeDatesToToday();
 }
 
 void ConverterModuleView::AddDragger() {
@@ -222,8 +233,85 @@ void ConverterModuleView::MessageReceived(BMessage* in) {
 void ConverterModuleView::InitializeDatesToToday()
 {
 	fGregorianDate = GregorianDate(std::time(nullptr));
-//	fGregorianDateStringView->SetText(fGregorianDate.ToString().String());
 	fHebrewDate = fJewishCalendar.ToHebrewDate(fGregorianDate);
-//	fHebrewDateStringView->SetText(fJewishCalendar.HebrewDateToString(fHebrewDate).String());
+	InitializeDateFields();
 	this->Invalidate();
+}
+
+void ConverterModuleView::InitializeDateFields()
+{
+	char buffer[50];
+	sprintf(buffer, "%4d", fHebrewDate.Year());
+	fHYear = new NumbersTextControl(4, "Hebrew year", B_TRANSLATE("Year"), buffer);
+	sprintf(buffer, "%4d", fGregorianDate.year);
+	fGYear = new NumbersTextControl(4, "Gregorian year", B_TRANSLATE("Year"), buffer);
+	BuildMonthsMenus(static_cast<uint>(fHebrewDate.Year()));
+	fHMonth = new BMenuField("Hebrew month", B_TRANSLATE("Month"), fHMonths);
+	fGMonth = new BMenuField("Gregorian month", B_TRANSLATE("Month"), fGMonths);
+	fHMonth->Menu()->FindItem(JewishMonths[fHebrewDate.Month()].name.String())->SetMarked(true);
+	fGMonth->Menu()->FindItem(GregorianMonthNames[fGregorianDate.month].String())->SetMarked(true);
+	BuildHebrewDaysMenus(static_cast<uint>(fHebrewDate.Year()),
+						 static_cast<uint>(fHebrewDate.Month()));
+	BuildGregorianDaysMenus(static_cast<uint>(fGregorianDate.year),
+							static_cast<uint>(fGregorianDate.month));
+	fHDay = new BMenuField("Hebrew day", B_TRANSLATE("Day"), fHDays);
+	fGDay = new BMenuField("Gregorian day", B_TRANSLATE("Day"), fGDays);
+	sprintf(buffer, "%d", fGregorianDate.day);
+	fGDays->FindItem(buffer)->SetMarked(true);
+	sprintf(buffer, "%d", fHebrewDate.Day());
+	fHDays->FindItem(buffer)->SetMarked(true);
+}
+
+void ConverterModuleView::BuildMonthsMenus(uint hebrewYear)
+{
+	BMenuItem* monthItem;
+	ClearMenu(fHMonths); ClearMenu(fGMonths);
+	// Gregorian menu
+	for (int i=1; i<=12; i++) {
+		monthItem = new BMenuItem(GregorianMonthNames[i].String(), nullptr);
+		fGMonths->AddItem(monthItem);
+	}
+	// Hebrew months menu
+	for (int i = 1; i <= 14; i++) {
+		if (fJewishCalendar.IsValidHebrewMonth(hebrewYear, i)) {
+			monthItem = new BMenuItem(JewishMonths[i].name.String(), nullptr);
+			fHMonths->AddItem(monthItem);
+		}
+	}
+}
+
+void ConverterModuleView::BuildHebrewDaysMenus(uint hebrewYear, uint hebrewMonth)
+{	
+	BMenuItem* dayItem;
+	ClearMenu(fHDays);
+	int limit = fJewishCalendar.DaysInHebrewMonth(hebrewYear, hebrewMonth);
+	char buffer[10];
+	for (int i = 1; i <= limit; i++) {
+		sprintf (buffer, "%2d", i);
+		dayItem = new BMenuItem(buffer, nullptr);
+		fHDays->AddItem(dayItem);
+	}
+}
+
+void ConverterModuleView::BuildGregorianDaysMenus(uint year, uint month)
+{
+	BMenuItem* dayItem;
+	ClearMenu(fGDays);
+	int limit = fJewishCalendar.DaysInGregorianMonth(year, month);
+	char buffer[10];
+	for (int i = 1; i <= limit; i++) {
+		sprintf (buffer, "%2d", i);
+		dayItem = new BMenuItem(buffer, nullptr);
+		fGDays->AddItem(dayItem);
+	}
+}
+
+void ConverterModuleView::ClearMenu(BMenu* in)
+{
+	if (in == nullptr) return;
+	BMenuItem* item = 0x1000;
+	while (item != nullptr) {
+		item = in->RemoveItem(0);
+		free(item);
+	}
 }

@@ -104,7 +104,9 @@ public:
 	int HolidayId(const GregorianDate& date) const;		
 	int HolidayType(const GregorianDate& date) const;
 	int DaysInHebrewMonth(uint year, uint month) const;
-
+	int DaysInGregorianMonth(uint year, uint month) const;
+	int MonthsInHebrewYear(uint year) const;
+	bool IsValidHebrewMonth(uint year, uint month) const;
 private:
 	bool _diaspora;
 };

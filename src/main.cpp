@@ -21,7 +21,7 @@ public:
     	BLocaleRoster* be_locale_roster = BLocaleRoster::Default();
 //    	be_locale_roster->SetPreferredLanguages("ru");
     	
-        BRect frame(100, 100, 470, 700);
+        BRect frame(100, 100, 770, 700);
         BWindow* window = new BWindow(frame, "Clockwork — Today", B_TITLED_WINDOW,
         	B_QUIT_ON_WINDOW_CLOSE | B_AUTO_UPDATE_SIZE_LIMITS);
 
