@@ -9,6 +9,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <Deskbar.h>
+#include <Handler.h>
 #include <Menu.h>
 #include <PopUpMenu.h>
 #include <MenuField.h>
@@ -34,6 +35,10 @@
 const uint32	CONVERT_TO_GREGORIAN= 'cTGr';
 const uint32	CONVERT_TO_HEBREW	= 'cTHb';
 const uint32	TEXT_CHANGED		= 'cHgd';
+const uint32	GREGORIAN_YEAR_CHG	= 'GYCH';
+const uint32	HEBREW_YEAR_CHG		= 'HYCH';
+const uint32	GREGORIAN_MONTH_CHG = 'GMCH';
+const uint32	HEBREW_MONTH_CHG	= 'HMCH';
 
 class NumbersTextControl : public BTextControl {
 public:
@@ -47,12 +52,20 @@ public:
 	virtual status_t Archive(BMessage* out, bool deep = true);
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage* in);
-	
+	virtual status_t SetMessage(BMessage* message) {
+		fToSetUponChange = message; return B_OK;
+	}
+	void SetStringToReplace(const char* );
+	void SetHandler (BHandler* in) {
+		fTarget = in;
+	}
 	virtual void KeyDown(const char* bytes, int32 numBytes);
 private:
+	char buffer[50];
 	uint fAllowedDigits;
 	bool fSanitizing;
-	
+	BMessage* fToSendUponChange;
+	BHandler* fTarget;
 	void SanitizeText();
 };
 
@@ -79,9 +92,9 @@ private:
 	NumbersTextControl*	fHYear;
 	NumbersTextControl* fGYear;
 	BMenuField*		fHMonth;
-	BPopUpMenu*			fHMonths;
+	BPopUpMenu*		fHMonths;
 	BMenuField*		fGMonth;
-	BPopUpMenu*			fGMonths;
+	BPopUpMenu*		fGMonths;
 	BMenuField*		fGDay;
 	BPopUpMenu*		fGDays;
 	BMenuField*		fHDay;
@@ -95,10 +108,12 @@ private:
 	void InitializeDateFields();
 	void AddDragger();
 	void InitializeDatesToToday();
-	void BuildMonthsMenus(uint hebrewYear);
+	void BuildHebrewMonthsMenu(uint hebrewYear);
+	void BuildGregorianMonthsMenu();
 	void BuildHebrewDaysMenus(uint hebrewYear, uint hebrewMonth);
 	void BuildGregorianDaysMenus(uint gregorianYear, uint gregorianMonth);
 	void ClearMenu(BMenu* );
+	int FindCurrentlySelectedItem(BPopUpMenu*, const char* string);
 };
 
 

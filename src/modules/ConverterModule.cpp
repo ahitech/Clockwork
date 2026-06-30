@@ -6,6 +6,8 @@
 #include "ConverterModule.h"
 #include <GridLayout.h>
 #include <MenuItem.h>
+#include <stdio.h>
+#include <string.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "ConverterModule"
@@ -19,17 +21,21 @@ NumbersTextControl::NumbersTextControl( uint allowedDigits,
 						BMessage* message = nullptr) :
 		BTextControl(name, label, data, message),
 		fAllowedDigits(allowedDigits),
-		fSanitizing(false)
+		fSanitizing(false),
+		fToSendUponChange(nullptr)
 {
-
+	buffer[0] = '\0';
 };
 
 NumbersTextControl::NumbersTextControl(BMessage* in)
 	:	BTextControl(in),
-		fSanitizing(false)
+		fSanitizing(false),
+		fToSendUponChange(nullptr)
 {
 	if (in->FindInt32("Allowed Digits", (int32*)(&fAllowedDigits)) != B_OK)
 		fAllowedDigits = 4;
+	if (in->FindString("String to replace", &buffer) != B_OK)
+		buffer[0] = '\0';
 }
 
 
@@ -40,17 +46,31 @@ status_t NumbersTextControl::Archive(BMessage* out, bool deep = true)
 		return toReturn;
 	}
 	toReturn = out->AddInt32("Allowed Digits", static_cast<int32>(fAllowedDigits));
-	
+	if (toReturn != B_OK) {
+		return toReturn;
+	}
+	toReturn = out->AddString("String to replace", buffer);
 	return toReturn;
+}
+
+void NumbersTextControl::SetStringToReplace(const char* string)
+{
+	strncpy(buffer, string, 50);
 }
 
 void NumbersTextControl::MessageReceived(BMessage* in) {
 	switch (in->what)
 	{
 		case (TEXT_CHANGED):
+		{
 			SanitizeText();
+			if (fToSendUponChange && strlen(buffer) > 0) {
+				int num = std::stoi(Text());
+				fToSendUponChange->ReplaceInt32(buffer, num);
+				fTarget->MessageReceived(fToSendUponChange);
+			}
 			break;
-		
+		}
 		default:
 			BTextControl::MessageReceived(in);
 			break;
@@ -225,6 +245,40 @@ void ConverterModuleView::MessageReceived(BMessage* in) {
 		case CONVERT_TO_HEBREW:
 			printf("Going to convert to Hebrew!\n");
 			break;
+		case GREGORIAN_YEAR_CHG:
+		{
+			int32 newYear;
+			in->FindInt32("year", &newYear);
+			if (newYear / 1000.0f < 1)	// Only 3 or less digits in year
+			{
+				char buffer[10];
+				newYear += 1000;
+				sprintf(buffer, "%04d", newYear);
+				fGYear.SetText(buffer);
+			}
+			fGregorianDate.year = newYear;
+			BuildGregorianMonthsMenu();
+			BuildGregorianDaysMenu();
+			break;
+		}
+		case HEBREW_YEAR_CHG:
+		{
+			int32 newYear;
+			in->FindInt32("year", &newYear);
+			while (newYear / 1000.0f < 5)	// Years long in the past
+			{
+				newYear += 1000;
+			}
+			char buffer[10];
+			sprintf(buffer, "%04d", newYear);
+			fHYear.SetText(buffer);
+			
+			fHebrewDate.SetYear(newYear);
+			BuildHebrewMonthsMenu(newYear);
+			break;
+		}
+		case GREGORIAN_MONTH_CHG:
+			BuildGregorianDaysMenus(uint gregorianYear, uint gregorianMonth);
 		default:
 			BBox::MessageReceived(in);
 	}
@@ -241,10 +295,19 @@ void ConverterModuleView::InitializeDatesToToday()
 void ConverterModuleView::InitializeDateFields()
 {
 	char buffer[50];
+	BMessage* toSend;
 	sprintf(buffer, "%4d", fHebrewDate.Year());
 	fHYear = new NumbersTextControl(4, "Hebrew year", B_TRANSLATE("Year"), buffer);
+	toSend = new BMessage(HEBREW_YEAR_CHG);
+	toSend->AddInt32("Year", fHebrewDate.Year());
+	fHYear->SetMessage(toSend);
+	fHYear->SetTarget(this);
 	sprintf(buffer, "%4d", fGregorianDate.year);
 	fGYear = new NumbersTextControl(4, "Gregorian year", B_TRANSLATE("Year"), buffer);
+	toSend = new BMessage(GREGORIAN_YEAR_CHG);
+	toSend->AddInt32("Year", fGregorianDate.year);
+	fHYear->SetMessage(toSend);
+	fHYear->SetTarget(this);
 	BuildMonthsMenus(static_cast<uint>(fHebrewDate.Year()));
 	fHMonth = new BMenuField("Hebrew month", B_TRANSLATE("Month"), fHMonths);
 	fGMonth = new BMenuField("Gregorian month", B_TRANSLATE("Month"), fGMonths);
@@ -262,21 +325,55 @@ void ConverterModuleView::InitializeDateFields()
 	fHDays->FindItem(buffer)->SetMarked(true);
 }
 
-void ConverterModuleView::BuildMonthsMenus(uint hebrewYear)
+void ConverterModuleView::BuildHebrewMonthsMenu(uint hebrewYear)
 {
 	BMenuItem* monthItem;
 	ClearMenu(fHMonths); ClearMenu(fGMonths);
-	// Gregorian menu
-	for (int i=1; i<=12; i++) {
-		monthItem = new BMenuItem(GregorianMonthNames[i].String(), nullptr);
-		fGMonths->AddItem(monthItem);
-	}
+
 	// Hebrew months menu
 	for (int i = 1; i <= 14; i++) {
 		if (fJewishCalendar.IsValidHebrewMonth(hebrewYear, i)) {
 			monthItem = new BMenuItem(JewishMonths[i].name.String(), nullptr);
 			fHMonths->AddItem(monthItem);
 		}
+	}
+}
+
+/**
+ *	\brief		Finds the number corresponding to selected item in a menu
+ *	\param[in]	menu	The menu to search for the item
+ *	\param[in]	string	The string according to which searching
+ *	\returns	The number associated with the selected item
+ *				-1 in case of any error
+ */
+int ConverterModuleView::FindCurrentlySelectedItem(BPopUpMenu* menu,
+			const char* string)
+{
+	int toReturn = -1;	// No item selected
+	BMenuItem* menuItem = menu->FindMarked();
+	if (nullptr == menuItem) { return toReturn; }
+	BMessage* message = menuItem->Message();
+	if (B_OK != message->FindInt8(string, &toReturn)) { return -1; }
+	return toReturn;	
+}
+
+void ConverterModuleView::BuildGregorianMonthsMenu() {
+	BMenuItem* monthItem;
+	BMessage* message;
+	// Save currently selected item
+	int selectedItem = FindCurrentlySelectedItem(fGMonths, "Month");
+
+	// Basically, here I would clear the menu and recreate it,
+	// but since in gregorian calendar all years have the same months,
+	// I'm going to reuse current menu.
+	//	ClearMenu(fGMonths);
+	
+	// Gregorian menu
+	for (int i=1; i<=12; i++) {
+		message = new BMessage(GREGORIAN_MONTH_CHG);
+		message->AddInt8("Month", i);
+		monthItem = new BMenuItem(GregorianMonthNames[i].String(), message);
+		fGMonths->AddItem(monthItem);
 	}
 }
 

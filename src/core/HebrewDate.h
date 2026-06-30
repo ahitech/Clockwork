@@ -17,6 +17,10 @@ public:
     int Month() const;
     int Year() const;
     
+    void SetDay(int day) { hDay_ = day; }
+    void SetMonth(int month) { hMonth_ = month; }
+    void SetYear(int year) { hYear_ = year; }
+    
     unsigned int TotalDaysInThisMonth() const;
     
     std::string HebrewMonthName() const;
@@ -24,6 +28,8 @@ public:
     std::string ToStringShort() const;
     std::string ToParsha() const;
     std::string ToHolidayName() const;
+    
+    void NormalizeDate(void);
 
 private:
     int hYear_;
