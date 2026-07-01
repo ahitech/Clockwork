@@ -353,7 +353,7 @@ int ConverterModuleView::FindCurrentlySelectedItem(BPopUpMenu* menu,
 	BMenuItem* menuItem = menu->FindMarked();
 	if (nullptr == menuItem) { return toReturn; }
 	BMessage* message = menuItem->Message();
-	if (B_OK != message->FindInt8(string, &toReturn)) { return -1; }
+	if (B_OK != message->FindInt8(string, static_cast<int8*>(&toReturn))) { return -1; }
 	return toReturn;	
 }
 
@@ -406,7 +406,7 @@ void ConverterModuleView::BuildGregorianDaysMenus(uint year, uint month)
 void ConverterModuleView::ClearMenu(BMenu* in)
 {
 	if (in == nullptr) return;
-	BMenuItem* item = 0x1000;
+	BMenuItem* item = static_cast<BMenuItem*>(0x1000);
 	while (item != nullptr) {
 		item = in->RemoveItem(0);
 		free(item);
