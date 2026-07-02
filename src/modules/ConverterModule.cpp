@@ -64,11 +64,6 @@ void NumbersTextControl::MessageReceived(BMessage* in) {
 		case (TEXT_CHANGED):
 		{
 			SanitizeText();
-			if (fToSendUponChange && strlen(buffer) > 0) {
-				int num = std::stoi(Text());
-				fToSendUponChange->ReplaceInt32(buffer, num);
-				fTarget->MessageReceived(fToSendUponChange);
-			}
 			break;
 		}
 		default:
@@ -254,11 +249,11 @@ void ConverterModuleView::MessageReceived(BMessage* in) {
 				char buffer[10];
 				newYear += 1000;
 				sprintf(buffer, "%04d", newYear);
-				fGYear.SetText(buffer);
+				fGYear->SetText(buffer);
 			}
 			fGregorianDate.year = newYear;
 			BuildGregorianMonthsMenu();
-			BuildGregorianDaysMenu();
+			BuildGregorianDaysMenus(newYear, fGregorianDate.month);
 			break;
 		}
 		case HEBREW_YEAR_CHG:
@@ -271,14 +266,14 @@ void ConverterModuleView::MessageReceived(BMessage* in) {
 			}
 			char buffer[10];
 			sprintf(buffer, "%04d", newYear);
-			fHYear.SetText(buffer);
+			fHYear->SetText(buffer);
 			
 			fHebrewDate.SetYear(newYear);
 			BuildHebrewMonthsMenu(newYear);
 			break;
 		}
 		case GREGORIAN_MONTH_CHG:
-			BuildGregorianDaysMenus(uint gregorianYear, uint gregorianMonth);
+			BuildGregorianDaysMenus(gregorianYear, gregorianMonth);
 		default:
 			BBox::MessageReceived(in);
 	}
@@ -308,7 +303,7 @@ void ConverterModuleView::InitializeDateFields()
 	toSend->AddInt32("Year", fGregorianDate.year);
 	fHYear->SetMessage(toSend);
 	fHYear->SetTarget(this);
-	BuildMonthsMenus(static_cast<uint>(fHebrewDate.Year()));
+	BuildHebrewMonthsMenu(static_cast<uint>(fHebrewDate.Year()));
 	fHMonth = new BMenuField("Hebrew month", B_TRANSLATE("Month"), fHMonths);
 	fGMonth = new BMenuField("Gregorian month", B_TRANSLATE("Month"), fGMonths);
 	fHMonth->Menu()->FindItem(JewishMonths[fHebrewDate.Month()].name.String())->SetMarked(true);
@@ -353,7 +348,7 @@ int ConverterModuleView::FindCurrentlySelectedItem(BPopUpMenu* menu,
 	BMenuItem* menuItem = menu->FindMarked();
 	if (nullptr == menuItem) { return toReturn; }
 	BMessage* message = menuItem->Message();
-	if (B_OK != message->FindInt8(string, static_cast<int8*>(&toReturn))) { return -1; }
+	if (B_OK != message->FindInt8(string, (int8*)(&toReturn))) { return -1; }
 	return toReturn;	
 }
 
@@ -406,7 +401,7 @@ void ConverterModuleView::BuildGregorianDaysMenus(uint year, uint month)
 void ConverterModuleView::ClearMenu(BMenu* in)
 {
 	if (in == nullptr) return;
-	BMenuItem* item = static_cast<BMenuItem*>(0x1000);
+	BMenuItem* item = (BMenuItem*)(0x1000);
 	while (item != nullptr) {
 		item = in->RemoveItem(0);
 		free(item);
